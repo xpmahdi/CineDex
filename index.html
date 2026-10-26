@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CineDex - Discover & Track TV Shows</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      background-color: #0b0f19;
+      color: #f3f4f6;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    .poster-glow {
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.7), 0 8px 10px -6px rgba(0, 0, 0, 0.7);
+    }
+    .hero-bg {
+      background: linear-gradient(180deg, rgba(11,15,25,0.4) 0%, rgba(11,15,25,1) 100%),
+                  radial-gradient(circle at top right, rgba(234,179,8,0.15), transparent 50%);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-amber-500 selection:text-black">
+
+  <!-- NAVBAR -->
+  <header class="border-b border-gray-800/80 sticky top-0 z-40 bg-[#0b0f19]/90 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-8">
+        <a href="#" class="flex items-center gap-2 text-2xl font-black tracking-wider text-white">
+          <span class="w-8 h-8 rounded-lg bg-amber-500 flex items-center justify-center text-black font-black text-lg shadow-lg shadow-amber-500/20">C</span>
+          Cine<span class="text-amber-400">Dex</span>
+        </a>
+        <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-gray-400">
+          <a href="#" class="text-white hover:text-amber-400 transition-colors"><i class="fa-solid fa-compass mr-1 text-xs"></i> Discover</a>
+          <a href="#watchlist" class="hover:text-amber-400 transition-colors"><i class="fa-solid fa-bookmark mr-1 text-xs"></i> Watchlist</a>
+          <a href="#favorites" class="hover:text-amber-400 transition-colors"><i class="fa-solid fa-heart mr-1 text-xs"></i> Favorites</a>
+        </nav>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <div class="relative hidden sm:block w-64">
+          <input 
+            type="text" 
+            id="searchInput"
+            placeholder="Search TV shows..." 
+            class="w-full bg-gray-900 border border-gray-700/80 rounded-full py-1.5 pl-9 pr-4 text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-amber-500 transition-all"
+            oninput="handleSearch(this.value)"
+          />
+          <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-xs text-gray-500"></i>
+        </div>
+
+        <button 
+          id="authBtn"
+          onclick="openAuthModal()" 
+          class="bg-amber-500 hover:bg-amber-400 text-black text-sm font-bold px-5 py-2 rounded-full transition-all shadow-md shadow-amber-500/20 flex items-center gap-2">
+          <i class="fa-solid fa-user"></i>
+          <span>Sign In</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO SPOTLIGHT SECTION -->
+  <section class="hero-bg border-b border-gray-800/60 py-10 px-4">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-8">
+      <div class="flex-1 space-y-4">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-semibold tracking-wider uppercase">
+          <i class="fa-solid fa-star text-[10px]"></i> Spotlight Pick
+        </div>
+        <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight text-white">Dexter</h1>
+        <div class="flex items-center gap-3 text-xs sm:text-sm text-gray-400 font-medium">
+          <span class="text-amber-400 font-bold flex items-center gap-1"><i class="fa-solid fa-star"></i> 8.7</span>
+          <span>•</span>
+          <span>Crime, Drama, Mystery</span>
+          <span>•</span>
+          <span>2006</span>
+          <span>•</span>
+          <span class="px-2 py-0.5 rounded bg-gray-800 text-gray-300">Dexter Universe</span>
+        </div>
+        <p class="text-gray-300 text-sm sm:text-base leading-relaxed max-w-2xl">
+          He's smart. He's lovable. America's favorite serial killer, who spends his days solving crimes and nights committing them under a strict moral code.
+        </p>
+        <div class="flex items-center gap-3 pt-2">
+          <button onclick="toggleSpotlightFavorite()" class="bg-amber-500 hover:bg-amber-400 text-black px-6 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center gap-2 shadow-lg shadow-amber-500/20">
+            <i class="fa-solid fa-heart" id="spotlightHeart"></i> Add to Favorites
+          </button>
+        </div>
+      </div>
+      <div class="w-48 sm:w-60 shrink-0">
+        <img 
+          src="https://m.media-amazon.com/images/M/MV5BNDBhMmFiOGUtNzY4Mi00OGVkLWE5NzctZWI0MDY3YTU4M2IzXkEyXkFqcGc@._V1_SX500.jpg" 
+          alt="Dexter Poster" 
+          class="w-full rounded-2xl poster-glow border border-gray-700/60 object-cover"
+        />
+      </div>
+    </div>
+  </section>
+
+  <!-- MAIN CATALOG -->
+  <main class="max-w-7xl mx-auto px-4 py-10 w-full flex-1">
+    <div class="flex items-center justify-between mb-8 pb-4 border-b border-gray-800 flex-wrap gap-4">
+      <div>
+        <h2 class="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
+          <span>Explore Series</span>
+          <span id="showsCount" class="text-xs bg-gray-800 text-gray-400 font-normal px-2.5 py-0.5 rounded-full">0 shows</span>
+        </h2>
+        <p class="text-xs text-gray-400 mt-1">Synced live with Render FastAPI & Neon PostgreSQL</p>
+      </div>
+
+      <div id="backendStatus" class="flex items-center gap-2 text-xs px-3 py-1.5 rounded-full bg-gray-900 border border-gray-800 text-gray-400">
+        <span class="w-2 h-2 rounded-full bg-yellow-400 animate-pulse"></span> Connecting to API...
+      </div>
+    </div>
+
+    <div id="showsGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-6">
+      <div class="h-80 bg-gray-900/60 rounded-2xl animate-pulse border border-gray-800"></div>
+      <div class="h-80 bg-gray-900/60 rounded-2xl animate-pulse border border-gray-800"></div>
+      <div class="h-80 bg-gray-900/60 rounded-2xl animate-pulse border border-gray-800"></div>
+      <div class="h-80 bg-gray-900/60 rounded-2xl animate-pulse border border-gray-800"></div>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="border-t border-gray-800/80 bg-gray-950 py-6 text-center text-xs text-gray-500">
+    CineDex Full-Stack Application • Powered by FastAPI & PostgreSQL
+  </footer>
+
+  <!-- AUTH MODAL -->
+  <div id="authModal" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-gray-900 border border-gray-700/80 rounded-2xl max-w-sm w-full p-6 relative shadow-2xl">
+      <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors">
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
+
+      <h3 class="text-xl font-bold text-white mb-1" id="modalTitle">Welcome to CineDex</h3>
+      <p class="text-xs text-gray-400 mb-6">Sign in to track watched episodes and favorites</p>
+
+      <form id="authForm" onsubmit="handleAuthSubmit(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-gray-300 mb-1">Username / Email</label>
+          <input 
+            type="text" 
+            id="authUsername" 
+            required 
+            class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500 transition-all"
+            placeholder="admin"
+          />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-300 mb-1">Password</label>
+          <input 
+            type="password" 
+            id="authPassword" 
+            required 
+            class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500 transition-all"
+            placeholder="••••••••"
+          />
+        </div>
+        <button 
+          type="submit" 
+          class="w-full bg-amber-500 hover:bg-amber-400 text-black font-bold py-2.5 rounded-xl text-sm transition-all shadow-md shadow-amber-500/20 mt-2">
+          Sign In
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = "https://cinedex-w9i6.onrender.com";
+    let allShows = [];
+
+    window.openAuthModal = function() {
+      const modal = document.getElementById("authModal");
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+    };
+
+    window.closeAuthModal = function() {
+      const modal = document.getElementById("authModal");
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+    };
+
+    document.getElementById("authModal").addEventListener("click", function(e) {
+      if (e.target === this) closeAuthModal();
+    });
+
+    window.handleAuthSubmit = function(e) {
+      e.preventDefault();
+      const user = document.getElementById("authUsername").value;
+      alert(`Welcome, ${user}! Authentication session is active.`);
+      document.getElementById("authBtn").innerHTML = `<i class="fa-solid fa-circle-user text-amber-400"></i> <span>${user}</span>`; closeAuthModal(); };  let isSpotFav = false; window.toggleSpotlightFavorite = function() { isSpotFav = !isSpotFav; const heart = document.getElementById("spotlightHeart"); heart.className = isSpotFav ? "fa-solid fa-heart text-red-500" : "fa-solid fa-heart"; };  async function fetchShows() { const statusBadge = document.getElementById("backendStatus"); const grid = document.getElementById("showsGrid"); const count = document.getElementById("showsCount");  try { const response = await fetch(`${API_BASE}/shows`);
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        
+        allShows = await response.json();
+        statusBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500"></span> Neon DB Connected`;
+        count.innerText = `${allShows.length} shows`;
+
+        renderShows(allShows);
+      } catch (err) {
+        console.error("API Fetch Error:", err);
+        statusBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-red-500"></span> Backend Offline`;
+        grid.innerHTML = `
+          <div class="col-span-full py-12 text-center text-gray-500">
+            <i class="fa-solid fa-circle-exclamation text-3xl text-amber-500/50 mb-3"></i>
+            <p class="text-sm">Could not fetch shows from <code>${API_BASE}</code>.</p>
+            <p class="text-xs text-gray-600 mt-1">If the Render service was sleeping, it may take ~30 seconds to wake up.</p>
+            <button onclick="fetchShows()" class="mt-4 px-4 py-1.5 bg-gray-800 text-gray-300 hover:text-white rounded-lg text-xs">Retry</button>
+          </div>
+        `;
+      }
+    }
+
+    function renderShows(shows) {
+      const grid = document.getElementById("showsGrid");
+      if (!shows || shows.length === 0) {
+        grid.innerHTML = `<div class="col-span-full text-center py-10 text-gray-500 text-sm">No shows found.</div>`;
+        return;
+      }
+
+      grid.innerHTML = shows.map(show => `
+        <div class="group bg-gray-900
+cat << 'EOF' > index.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CineDex - Discover & Track TV Shows</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      background-color: #0b0f19;
+      color: #f3f4f6;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    .poster-glow {
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.7), 0 8px 10px -6px rgba(0, 0, 0, 0.7);
+    }
+    .hero-bg {
+      background: linear-gradient(180deg, rgba(11,15,25,0.4) 0%, rgba(11,15,25,1) 100%),
+                  radial-gradient(circle at top right, rgba(234,179,8,0.15), transparent 50%);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-amber-500 selection:text-black">
+
+  <!-- NAVBAR -->
+  <header class="border-b border-gray-800/80 sticky top-0 z-40 bg-[#0b0f19]/90 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-8">
+        <a href="#" class="flex items-center gap-2 text-2xl font-black tracking-wider text-white">
+          <span class="w-8 h-8 rounded-lg bg-amber-500 flex items-center justify-center text-black font-black text-lg shadow-lg shadow-amber-500/20">C</span>
+          Cine<span class="text-amber-400">Dex</span>
+        </a>
+        <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-gray-400">
+          <a href="#" class="text-white hover:text-amber-400 transition-colors"><i class="fa-solid fa-compass mr-1 text-xs"></i> Discover</a>
+          <a href="#watchlist" class="hover:text-amber-400 transition-colors"><i class="fa-solid fa-bookmark mr-1 text-xs"></i> Watchlist</a>
+          <a href="#favorites" class="hover:text-amber-400 transition-colors"><i class="fa-solid fa-heart mr-1 text-xs"></i> Favorites</a>
+        </nav>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <div class="relative hidden sm:block w-64">
+          <input 
+            type="text" 
+            id="searchInput"
+            placeholder="Search TV shows..." 
+            class="w-full bg-gray-900 border border-gray-700/80 rounded-full py-1.5 pl-9 pr-4 text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-amber-500 transition-all"
+            oninput="handleSearch(this.value)"
+          />
+          <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-xs text-gray-500"></i>
+        </div>
+
+        <button 
+          id="authBtn"
+          onclick="openAuthModal()" 
+          class="bg-amber-500 hover:bg-amber-400 text-black text-sm font-bold px-5 py-2 rounded-full transition-all shadow-md shadow-amber-500/20 flex items-center gap-2">
+          <i class="fa-solid fa-user"></i>
+          <span>Sign In</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO SPOTLIGHT SECTION -->
+  <section class="hero-bg border-b border-gray-800/60 py-10 px-4">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-8">
+      <div class="flex-1 space-y-4">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-semibold tracking-wider uppercase">
+          <i class="fa-solid fa-star text-[10px]"></i> Spotlight Pick
+        </div>
+        <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight text-white">Dexter</h1>
+        <div class="flex items-center gap-3 text-xs sm:text-sm text-gray-400 font-medium">
+          <span class="text-amber-400 font-bold flex items-center gap-1"><i class="fa-solid fa-star"></i> 8.7</span>
+          <span>•</span>
+          <span>Crime, Drama, Mystery</span>
+          <span>•</span>
+          <span>2006</span>
+          <span>•</span>
+          <span class="px-2 py-0.5 rounded bg-gray-800 text-gray-300">Dexter Universe</span>
+        </div>
+        <p class="text-gray-300 text-sm sm:text-base leading-relaxed max-w-2xl">
+          He's smart. He's lovable. America's favorite serial killer, who spends his days solving crimes and nights committing them under a strict moral code.
+        </p>
+        <div class="flex items-center gap-3 pt-2">
+          <button onclick="toggleSpotlightFavorite()" class="bg-amber-500 hover:bg-amber-400 text-black px-6 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center gap-2 shadow-lg shadow-amber-500/20">
+            <i class="fa-solid fa-heart" id="spotlightHeart"></i> Add to Favorites
+          </button>
+        </div>
+      </div>
+      <div class="w-48 sm:w-60 shrink-0">
+        <img 
+          src="https://m.media-amazon.com/images/M/MV5BNDBhMmFiOGUtNzY4Mi00OGVkLWE5NzctZWI0MDY3YTU4M2IzXkEyXkFqcGc@._V1_SX500.jpg" 
+          alt="Dexter Poster" 
+          class="w-full rounded-2xl poster-glow border border-gray-700/60 object-cover"
+        />
+      </div>
+    </div>
+  </section>
+
+  <!-- MAIN CATALOG -->
+  <main class="max-w-7xl mx-auto px-4 py-10 w-full flex-1">
+    <div class="flex items-center justify-between mb-8 pb-4 border-b border-gray-800 flex-wrap gap-4">
+      <div>
+        <h2 class="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
+          <span>Explore Series</span>
+          <span id="showsCount" class="text-xs bg-gray-800 text-gray-400 font-normal px-2.5 py-0.5 rounded-full">0 shows</span>
+        </h2>
+        <p class="text-xs text-gray-400 mt-1">Synced live with Render FastAPI & Neon PostgreSQL</p>
+      </div>
+
+      <div id="backendStatus" class="flex items-center gap-2 text-xs px-3 py-1.5 rounded-full bg-gray-900 border border-gray-800 text-gray-400">
+        <span class="w-2 h-2 rounded-full bg-yellow-400 animate-pulse"></span> Connecting to API...
+      </div>
+    </div>
+
+    <div id="showsGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-6">
+      <div class="h-80 bg-gray-900/60 rounded-2xl animate-pulse border border-gray-800"></div>
+      <div class="h-80 bg-gray-900/60 rounded-2xl animate-pulse border border-gray-800"></div>
+      <div class="h-80 bg-gray-900/60 rounded-2xl animate-pulse border border-gray-800"></div>
+      <div class="h-80 bg-gray-900/60 rounded-2xl animate-pulse border border-gray-800"></div>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="border-t border-gray-800/80 bg-gray-950 py-6 text-center text-xs text-gray-500">
+    CineDex Full-Stack Application • Powered by FastAPI & PostgreSQL
+  </footer>
+
+  <!-- AUTH MODAL -->
+  <div id="authModal" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-gray-900 border border-gray-700/80 rounded-2xl max-w-sm w-full p-6 relative shadow-2xl">
+      <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors">
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
+
+      <h3 class="text-xl font-bold text-white mb-1" id="modalTitle">Welcome to CineDex</h3>
+      <p class="text-xs text-gray-400 mb-6">Sign in to track watched episodes and favorites</p>
+
+      <form id="authForm" onsubmit="handleAuthSubmit(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-gray-300 mb-1">Username / Email</label>
+          <input 
+            type="text" 
+            id="authUsername" 
+            required 
+            class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500 transition-all"
+            placeholder="admin"
+          />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-300 mb-1">Password</label>
+          <input 
+            type="password" 
+            id="authPassword" 
+            required 
+            class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500 transition-all"
+            placeholder="••••••••"
+          />
+        </div>
+        <button 
+          type="submit" 
+          class="w-full bg-amber-500 hover:bg-amber-400 text-black font-bold py-2.5 rounded-xl text-sm transition-all shadow-md shadow-amber-500/20 mt-2">
+          Sign In
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = "https://cinedex-w9i6.onrender.com";
+    let allShows = [];
+
+    window.openAuthModal = function() {
+      const modal = document.getElementById("authModal");
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+    };
+
+    window.closeAuthModal = function() {
+      const modal = document.getElementById("authModal");
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+    };
+
+    document.getElementById("authModal").addEventListener("click", function(e) {
+      if (e.target === this) closeAuthModal();
+    });
+
+    window.handleAuthSubmit = function(e) {
+      e.preventDefault();
+      const user = document.getElementById("authUsername").value;
+      alert(`Welcome, ${user}! Authentication session is active.`);
+      document.getElementById("authBtn").innerHTML = `<i class="fa-solid fa-circle-user text-amber-400"></i> <span>${user}</span>`;
+      closeAuthModal();
+    };
+
+    let isSpotFav = false;
+    window.toggleSpotlightFavorite = function() {
+      isSpotFav = !isSpotFav;
+      const heart = document.getElementById("spotlightHeart");
+      heart.className = isSpotFav ? "fa-solid fa-heart text-red-500" : "fa-solid fa-heart";
+    };
+
+    async function fetchShows() {
+      const statusBadge = document.getElementById("backendStatus");
+      const grid = document.getElementById("showsGrid");
+      const count = document.getElementById("showsCount");
+
+      try {
+        const response = await fetch(`${API_BASE}/shows`);
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        
+        allShows = await response.json();
+        statusBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500"></span> Neon DB Connected`;
+        count.innerText = `${allShows.length} shows`;
+
+        renderShows(allShows);
+      } catch (err) {
+        console.error("API Fetch Error:", err);
+        statusBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-red-500"></span> Backend Offline`;
+        grid.innerHTML = `
+          <div class="col-span-full py-12 text-center text-gray-500">
+            <i class="fa-solid fa-circle-exclamation text-3xl text-amber-500/50 mb-3"></i>
+            <p class="text-sm">Could not fetch shows from <code>${API_BASE}</code>.</p>
+            <p class="text-xs text-gray-600 mt-1">If the Render service was sleeping, it may take ~30 seconds to wake up.</p>
+            <button onclick="fetchShows()" class="mt-4 px-4 py-1.5 bg-gray-800 text-gray-300 hover:text-white rounded-lg text-xs">Retry</button>
+          </div>
+        `;
+      }
+    }
+
+    function renderShows(shows) {
+      const grid = document.getElementById("showsGrid");
+      if (!shows || shows.length === 0) {
+        grid.innerHTML = `<div class="col-span-full text-center py-10 text-gray-500 text-sm">No shows found.</div>`;
+        return;
+      }
+
+      grid.innerHTML = shows.map(show => `
+        <div class="group bg-gray-900 border border-gray-800/80 rounded-2xl overflow-hidden hover:border-amber-500/50 transition-all flex flex-col justify-between hover:shadow-xl hover:shadow-black">
+          <div class="relative overflow-hidden aspect-[2/3] bg-gray-950">
+            <img 
+              src="${show.poster_path || 'https://via.placeholder.com/300x450?text=No+Poster'}" 
+              alt="${show.title}" 
+              loading="lazy"
+              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              onerror="this.src='https://via.placeholder.com/300x450?text=CineDex'"
+            />
+            <div class="absolute top-2 right-2 bg-black/80 backdrop-blur-md px-2 py-0.5 rounded-md text-xs font-bold text-amber-400 flex items-center gap-1 border border-amber-500/20">
+              <i class="fa-solid fa-star text-[10px]"></i> ${show.vote_average || 'N/A'}
+            </div>
+            ${show.universe ? `<div class="absolute bottom-2 left-2 bg-black/70 backdrop-blur-sm px-2 py-0.5 rounded text-[10px] text-gray-300 border border-gray-700">${show.universe}</div>` : ''}
+          </div>
+          <div class="p-4 flex-1 flex flex-col justify-between gap-3">
+            <div>
+              <h3 class="font-bold text-white text-base group-hover:text-amber-400 transition-colors line-clamp-1">${show.title}</h3>
+              <p class="text-xs text-gray-400 mt-1 line-clamp-2">${show.overview || 'No description available.'}</p>
+            </div>
+            <div class="pt-2 border-t border-gray-800/80 flex items-center justify-between text-xs text-gray-500">
+              <span>${show.release_year || 'Series'}</span>
+              <span class="text-amber-500/80 font-medium">${show.genre ? show.genre.split(',')[0] : 'TV'}</span>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    window.handleSearch = function(query) {
+      const q = query.toLowerCase().trim();
+      if (!q) {
+        renderShows(allShows);
+        return;
+      }
+      const filtered = allShows.filter(s => 
+        (s.title && s.title.toLowerCase().includes(q)) || 
+        (s.genre && s.genre.toLowerCase().includes(q))
+      );
+      renderShows(filtered);
+    };
+
+    window.addEventListener("DOMContentLoaded", fetchShows);
+  </script>
+</body>
+</html>
