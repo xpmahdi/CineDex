@@ -1,0 +1,62 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-init-sql
+data:
+  init.sql: |
+    CREATE TABLE IF NOT EXISTS shows (
+        id SERIAL PRIMARY KEY,
+        title VARCHAR(255) NOT NULL,
+        overview TEXT,
+        vote_average NUMERIC(3, 1) DEFAULT 0.0
+    );
+    INSERT INTO shows (title, overview, vote_average) VALUES
+    ('Breaking Bad', 'A chemistry teacher turns to cooking meth.', 9.5),
+    ('Dexter', 'A forensic blood spatter analyst and serial killer.', 8.7),
+    ('Arcane', 'Tale of two sisters in Zaun and Piltover.', 9.0)
+    ON CONFLICT DO NOTHING;
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cinedex-postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cinedex-postgres
+  template:
+    metadata:
+      labels:
+        app: cinedex-postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:16-alpine
+          env:
+            - name: POSTGRES_USER
+              value: "cinedex_user"
+            - name: POSTGRES_PASSWORD
+              value: "cinedex_pass"
+            - name: POSTGRES_DB
+              value: "cinedex_db"
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - name: init-volume
+              mountPath: /docker-entrypoint-initdb.d
+      volumes:
+        - name: init-volume
+          configMap:
+            name: postgres-init-sql
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cinedex-postgres
+spec:
+  selector:
+    app: cinedex-postgres
+  ports:
+    - port: 5432
+      targetPort: 5432

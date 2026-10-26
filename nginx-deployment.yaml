@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cinedex-gateway
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: cinedex-gateway
+  template:
+    metadata:
+      labels:
+        app: cinedex-gateway
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:alpine
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: config-volume
+          mountPath: /etc/nginx/nginx.conf
+          subPath: nginx.conf
+      volumes:
+      - name: config-volume
+        configMap:
+          name: nginx-proxy-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cinedex-gateway-service
+spec:
+  type: NodePort
+  selector:
+    app: cinedex-gateway
+  ports:
+  - port: 80
+    targetPort: 80
+    nodePort: 30088

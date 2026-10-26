@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cinedex-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: cinedex-api
+  template:
+    metadata:
+      labels:
+        app: cinedex-api
+    spec:
+      containers:
+        - name: api
+          image: cinedex-api:v1
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8000
+          env:
+            - name: REDIS_HOST
+              value: "cinedex-redis"
+            - name: REDIS_PORT
+              value: "6379"
+            - name: DATABASE_URL
+              value: "postgresql://cinedex_user:cinedex_pass@cinedex-postgres:5432/cinedex_db"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cinedex-api-service
+spec:
+  selector:
+    app: cinedex-api
+  ports:
+    - port: 80
+      targetPort: 8000

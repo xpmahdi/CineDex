@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CineDex - TV Series Tracker</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-[#07090e] text-slate-100 min-h-screen">
+
+  <!-- ۱. نوبار بالای صفحه -->
+  <header class="fixed top-0 left-0 right-0 z-50 bg-[#07090e]/85 backdrop-blur-md border-b border-white/5 px-6 py-3.5">
+    <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+      
+      <div class="flex items-center gap-8">
+        <a href="#" class="text-2xl font-black tracking-tight text-white flex items-center gap-2">
+          <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-amber-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-amber-500/20">
+            <span class="text-sm">✦</span>
+          </div>
+          CineDex
+        </a>
+
+        <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-slate-400">
+          <button onclick="scrollToUniverse()" class="hover:text-amber-400 flex items-center gap-1.5 transition">
+            <span>🪐</span> <span data-i18n="nav_genres">Genre Universe</span>
+          </button>
+          <button onclick="scrollToUpcoming()" class="hover:text-amber-400 flex items-center gap-1.5 transition">
+            <span>⏳</span> <span data-i18n="nav_upcoming">Coming Soon</span>
+          </button>
+          <button onclick="setTab('all')" class="hover:text-white transition" data-i18n="nav_discover">Discover</button>
+          <button onclick="setTab('watchlist')" class="hover:text-white transition" data-i18n="nav_watchlist">Watchlist 📌</button>
+          <button onclick="setTab('favorite')" class="hover:text-white transition" data-i18n="nav_favorites">Favorites ❤️</button>
+          <button onclick="setTab('hate')" class="hover:text-white transition" data-i18n="nav_hate">Hate List 🤮</button>
+        </nav>
+      </div>
+
+      <div class="flex items-center gap-3 sm:gap-4">
+        <div class="w-32 sm:w-48 lg:w-56">
+          <input 
+            id="search-input" 
+            type="text" 
+            placeholder="Search series..." 
+            data-i18n-placeholder="search_placeholder"
+            class="w-full px-3.5 py-1.5 bg-white/5 border border-white/10 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-indigo-500 text-white placeholder-slate-500 transition"
+          />
+        </div>
+
+        <div class="relative">
+          <select id="lang-select" onchange="changeLanguage(this.value)" class="appearance-none bg-white/5 border border-white/10 hover:border-white/20 text-slate-200 text-xs sm:text-sm font-medium py-2 pl-3 pr-7 rounded-xl focus:outline-none cursor-pointer transition">
+            <option value="en" class="bg-[#0f131c] text-white">🇬🇧 English</option>
+            <option value="fa" class="bg-[#0f131c] text-white">🇮🇷 فارسی</option>
+            <option value="de" class="bg-[#0f131c] text-white">🇩🇪 Deutsch</option>
+            <option value="ja" class="bg-[#0f131c] text-white">🇯🇵 日本語</option>
+          </select>
+          <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-400">
+            <svg class="fill-current h-3 w-3" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
+          </div>
+        </div>
+
+        <div id="auth-section">
+          <button onclick="openAuthModal()" id="login-btn" class="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold rounded-xl text-xs sm:text-sm transition shadow-lg shadow-amber-500/20" data-i18n="btn_signin">
+            Sign In
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ۲. بنر هیرو سینمایی با اسلایدر خودکار -->
+  <section id="hero-section" class="relative h-[80vh] min-h-[580px] w-full flex items-end pb-16 px-6 overflow-hidden pt-20">
+    <div class="absolute inset-0 -z-10">
+      <img id="hero-bg" src="" alt="Backdrop" class="w-full h-full object-cover object-top opacity-40 scale-105 transition-all duration-700 ease-in-out">
+      <div class="absolute inset-0 bg-gradient-to-t from-[#07090e] via-[#07090e]/60 to-transparent"></div>
+      <div class="absolute inset-0 bg-gradient-to-r from-[#07090e] via-[#07090e]/40 to-transparent"></div>
+    </div>
+
+    <div class="max-w-7xl mx-auto w-full">
+      <div class="max-w-2xl space-y-4">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-semibold uppercase tracking-wider">
+          ★ Spotlight Pick
+        </div>
+
+        <h1 id="hero-title" class="text-4xl sm:text-6xl font-black tracking-tight text-white drop-shadow-md">
+          Dexter
+        </h1>
+
+        <div class="flex flex-wrap items-center gap-3 text-xs sm:text-sm text-slate-300 font-medium">
+          <span id="hero-badge" class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-bold">Top Rated</span>
+          <span id="hero-year">2006</span>
+          <span>•</span>
+          <span id="hero-seasons">8 Seasons</span>
+          <span>•</span>
+          <span id="hero-episodes">96 Episodes</span>
+        </div>
+
+        <p id="hero-desc" class="text-slate-300 text-sm sm:text-base line-clamp-3 leading-relaxed">
+          Loading overview...
+        </p>
+
+        <div class="flex items-center gap-3 pt-2">
+          <button id="hero-details-btn" onclick="openHeroDetails()" class="flex items-center gap-2 px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm transition shadow-lg shadow-indigo-600/30" data-i18n="hero_details">
+            ▶ View Details
+          </button>
+          <button id="hero-watch-btn" onclick="toggleHeroAction('watchlist')" class="flex items-center gap-2 px-5 py-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-white text-sm font-semibold transition" data-i18n="hero_add_watchlist">
+            + Add to Watchlist
+          </button>
+          <button id="hero-fav-btn" onclick="toggleHeroAction('favorite')" class="flex items-center gap-2 px-4 py-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-white text-sm font-semibold transition">
+            ❤️
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ۳. منظومه ژانرها (CineNest Genre Universe) -->
+  <section id="genre-universe-section" class="py-16 px-6 relative overflow-hidden bg-gradient-to-b from-transparent via-[#05070b] to-transparent">
+    <div class="max-w-7xl mx-auto text-center mb-8">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold uppercase mb-2">
+        <span>✨</span> Explore Universe
+      </div>
+      <h2 class="text-2xl sm:text-3xl font-black text-white" data-i18n="universe_title">Genre Universe</h2>
+      <p class="text-xs sm:text-sm text-slate-400 mt-1 max-w-md mx-auto" data-i18n="universe_desc">
+        Click any planet in our cinematic solar system to filter your series!
+      </p>
+    </div>
+
+    <div class="relative w-[340px] h-[340px] sm:w-[540px] sm:h-[540px] mx-auto flex items-center justify-center">
+      <div class="absolute w-[180px] h-[180px] sm:w-[260px] sm:h-[260px] rounded-full border border-white/[0.08] pointer-events-none"></div>
+      <div class="absolute w-[260px] h-[260px] sm:w-[390px] sm:h-[390px] rounded-full border border-white/[0.08] pointer-events-none"></div>
+      <div class="absolute w-[330px] h-[330px] sm:w-[510px] sm:h-[510px] rounded-full border border-white/[0.05] pointer-events-none"></div>
+
+      <button onclick="filterByGenre('all')" class="relative z-20 w-24 h-24 sm:w-36 sm:h-36 rounded-full bg-gradient-to-br from-amber-400 via-orange-500 to-amber-600 flex flex-col items-center justify-center text-slate-950 font-black shadow-[0_0_50px_rgba(245,158,11,0.5)] hover:scale-105 transition cursor-pointer group">
+        <span class="text-xl sm:text-2xl">✨</span>
+        <span class="text-[10px] sm:text-xs tracking-widest mt-0.5 font-extrabold uppercase">CineDex</span>
+        <span class="text-[9px] text-amber-950 font-semibold mt-0.5" data-i18n="planet_all">All Shows</span>
+      </button>
+
+      <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+        <button onclick="filterByGenre('Action')" class="planet pointer-events-auto absolute -top-2 sm:top-4 left-1/4 flex flex-col items-center group transition transform hover:scale-125">
+          <div class="w-10 h-10 sm:w-14 sm:h-14 rounded-full bg-gradient-to-tr from-rose-700 via-red-500 to-rose-400 shadow-[0_0_20px_rgba(244,63,94,0.6)] border border-rose-300/40"></div>
+          <span class="text-[10px] sm:text-xs font-bold text-slate-300 group-hover:text-rose-400 mt-1.5 transition">Action</span>
+        </button>
+
+        <button onclick="filterByGenre('Comedy')" class="planet pointer-events-auto absolute top-12 sm:top-20 right-1/4 flex flex-col items-center group transition transform hover:scale-125">
+          <div class="w-8 h-8 sm:w-12 sm:h-12 rounded-full bg-gradient-to-tr from-amber-600 via-yellow-400 to-amber-300 shadow-[0_0_20px_rgba(251,191,36,0.6)] border border-yellow-200/40"></div>
+          <span class="text-[10px] sm:text-xs font-bold text-slate-300 group-hover:text-yellow-400 mt-1.5 transition">Comedy</span>
+        </button>
+
+        <button onclick="filterByGenre('Animation')" class="planet pointer-events-auto absolute top-2 sm:top-8 right-8 sm:right-16 flex flex-col items-center group transition transform hover:scale-125">
+          <div class="w-9 h-9 sm:w-13 sm:h-13 rounded-full bg-gradient-to-tr from-teal-700 via-cyan-400 to-teal-300 shadow-[0_0_20px_rgba(45,212,191,0.6)] border border-cyan-200/40"></div>
+          <span class="text-[10px] sm:text-xs font-bold text-slate-300 group-hover:text-cyan-400 mt-1.5 transition">Animation</span>
+        </button>
+
+        <button onclick="filterByGenre('Crime')" class="planet pointer-events-auto absolute top-1/2 -left-3 sm:left-6 -translate-y-1/2 flex flex-col items-center group transition transform hover:scale-125">
+          <div class="w-8 h-8 sm:w-12 sm:h-12 rounded-full bg-gradient-to-tr from-slate-700 via-slate-400 to-blue-300 shadow-[0_0_20px_rgba(148,163,184,0.5)] border border-slate-200/40"></div>
+          <span class="text-[10px] sm:text-xs font-bold text-slate-300 group-hover:text-slate-200 mt-1.5 transition">Crime</span>
+        </button>
+
+        <button onclick="filterByGenre('Drama')" class="planet pointer-events-auto absolute bottom-12 sm:bottom-16 left-6 sm:left-14 flex flex-col items-center group transition transform hover:scale-125">
+          <div class="w-11 h-11 sm:w-16 sm:h-16 rounded-full bg-gradient-to-tr from-purple-800 via-fuchsia-600 to-indigo-400 shadow-[0_0_25px_rgba(192,132,252,0.6)] border border-purple-300/40"></div>
+          <span class="text-[10px] sm:text-xs font-bold text-slate-300 group-hover:text-fuchsia-400 mt-1.5 transition">Drama</span>
+        </button>
+
+        <button onclick="filterByGenre('Horror')" class="planet pointer-events-auto absolute top-1/2 -right-3 sm:right-6 -translate-y-1/2 flex flex-col items-center group transition transform hover:scale-125">
+          <div class="w-8 h-8 sm:w-12 sm:h-12 rounded-full bg-gradient-to-tr from-emerald-800 via-emerald-500 to-green-300 shadow-[0_0_20px_rgba(52,211,153,0.6)] border border-emerald-200/40"></div>
+          <span class="text-[10px] sm:text-xs font-bold text-slate-300 group-hover:text-emerald-400 mt-1.5 transition">Horror</span>
+        </button>
+
+        <button onclick="filterByGenre('Thriller')" class="planet pointer-events-auto absolute bottom-4 sm:bottom-6 right-24 sm:right-32 flex flex-col items-center group transition transform hover:scale-125">
+          <div class="w-9 h-9 sm:w-13 sm:h-13 rounded-full bg-gradient-to-tr from-orange-800 via-orange-600 to-amber-500 shadow-[0_0_20px_rgba(249,115,22,0.6)] border border-orange-300/40"></div>
+          <span class="text-[10px] sm:text-xs font-bold text-slate-300 group-hover:text-orange-400 mt-1.5 transition">Thriller</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ۴. گرید کاتالوگ سریال‌ها -->
+  <main id="catalog-section" class="max-w-7xl mx-auto px-6 pb-20">
+    <div class="flex items-center justify-between mb-8">
+      <div>
+        <h2 id="grid-heading" class="text-xl sm:text-2xl font-bold text-white tracking-tight" data-i18n="grid_explore">Explore Shows</h2>
+        <p id="grid-subheading" class="text-xs sm:text-sm text-slate-400 mt-1" data-i18n="grid_sub">Showing titles from database</p>
+      </div>
+      <div id="active-genre-badge" class="hidden px-3 py-1 rounded-full bg-amber-500/20 text-amber-400 text-xs font-bold border border-amber-500/30"></div>
+    </div>
+
+    <div id="shows-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-6">
+      <p class="col-span-full text-center text-slate-500 py-12">Loading series...</p>
+    </div>
+  </main>
+
+  <!-- ۵. بخش اختصاصی اکران‌های آینده و شمارش معکوس زنده با تصاویر معتبر و فعال -->
+  <section id="upcoming-section" class="py-16 px-6 border-t border-white/5 bg-[#090c12]">
+    <div class="max-w-7xl mx-auto">
+      
+      <div class="mb-8">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-semibold uppercase mb-2">
+          <span>📅</span> Calendar
+        </div>
+        <h2 class="text-2xl sm:text-3xl font-black text-white" data-i18n="calendar_title">Coming Soon</h2>
+        <p class="text-xs sm:text-sm text-slate-400 mt-1" data-i18n="calendar_desc">
+          The nearest upcoming releases, with a live countdown for the closest premiere.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        
+        <!-- کارت بزرگ شمارش معکوس زنده (Premiere) -->
+        <div class="lg:col-span-5 bg-[#0e131d] border border-white/10 rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+          <div class="text-[11px] font-black uppercase tracking-widest text-amber-400 mb-4" data-i18n="next_premiere">
+            NEXT PREMIERE
+          </div>
+
+          <div class="flex items-center gap-5">
+            <div class="relative w-24 h-36 rounded-2xl overflow-hidden shadow-lg border border-white/10 shrink-0 bg-slate-800">
+              <img 
+                src="https://static.tvmaze.com/uploads/images/medium_portrait/367/918731.jpg" 
+                alt="Dexter: Original Sin" 
+                class="w-full h-full object-cover"
+              >
+            </div>
+            <div>
+              <h3 class="text-xl sm:text-2xl font-black text-white">Dexter: Original Sin</h3>
+              <div class="inline-block mt-2 px-2.5 py-1 rounded-lg bg-amber-500/10 border border-amber-500/20 text-xs font-semibold text-amber-400">
+                Series • Premiere
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-8 pt-6 border-t border-white/5">
+            <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-3" data-i18n="releases_in">
+              RELEASES IN
+            </span>
+
+            <div class="grid grid-cols-3 gap-3 text-center">
+              <div class="bg-[#141b27] border border-white/5 rounded-2xl py-3">
+                <span id="countdown-hours" class="text-2xl sm:text-3xl font-black text-white block">102</span>
+                <span class="text-[10px] text-slate-400 uppercase font-semibold">HRS</span>
+              </div>
+              <div class="bg-[#141b27] border border-white/5 rounded-2xl py-3">
+                <span id="countdown-mins" class="text-2xl sm:text-3xl font-black text-white block">21</span>
+                <span class="text-[10px] text-slate-400 uppercase font-semibold">MIN</span>
+              </div>
+              <div class="bg-[#141b27] border border-white/5 rounded-2xl py-3">
+                <span id="countdown-secs" class="text-2xl sm:text-3xl font-black text-white block">45</span>
+                <span class="text-[10px] text-slate-400 uppercase font-semibold">SEC</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- کارت‌های عناوین آینده با پوسترهای فعال -->
+        <div class="lg:col-span-7 grid grid-cols-2 sm:grid-cols-4 gap-4">
+          
+          <!-- کارت ۱: Dexter Resurrection -->
+          <div class="group relative bg-[#0e131d] border border-white/5 rounded-2xl overflow-hidden hover:border-amber-500/50 transition duration-300">
+            <div class="relative aspect-[2/3] overflow-hidden bg-slate-900">
+              <img 
+                src="https://static.tvmaze.com/uploads/images/medium_portrait/498/1246142.jpg" 
+                alt="Dexter: Resurrection"
+                class="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+              >
+              <span class="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-amber-500 text-slate-950 font-black text-[10px] shadow">In 8 Days</span>
+            </div>
+            <div class="p-3">
+              <h4 class="text-xs font-bold text-white truncate">Dexter: Resurrection</h4>
+              <p class="text-[10px] text-slate-400 mt-0.5">Series</p>
+            </div>
+          </div>
+
+          <!-- کارت ۲: Tokyo Vice -->
+          <div class="group relative bg-[#0e131d] border border-white/5 rounded-2xl overflow-hidden hover:border-amber-500/50 transition duration-300">
+            <div class="relative aspect-[2/3] overflow-hidden bg-slate-900">
+              <img 
+                src="https://static.tvmaze.com/uploads/images/medium_portrait/403/1009087.jpg" 
+                alt="Tokyo Vice"
+                class="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+              >
+              <span class="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-white/10 backdrop-blur-md border border-white/10 text-white font-black text-[10px]">In 14 Days</span>
+            </div>
+            <div class="p-3">
+              <h4 class="text-xs font-bold text-white truncate">Tokyo Vice (S3)</h4>
+              <p class="text-[10px] text-slate-400 mt-0.5">Series</p>
+            </div>
+          </div>
+
+          <!-- کارت ۳: Daredevil -->
+          <div class="group relative bg-[#0e131d] border border-white/5 rounded-2xl overflow-hidden hover:border-amber-500/50 transition duration-300">
+            <div class="relative aspect-[2/3] overflow-hidden bg-slate-900">
+              <img 
+                src="https://static.tvmaze.com/uploads/images/medium_portrait/494/1236140.jpg" 
+                alt="Daredevil: Born Again"
+                class="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+              >
+              <span class="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-white/10 backdrop-blur-md border border-white/10 text-white font-black text-[10px]">In 19 Days</span>
+            </div>
+            <div class="p-3">
+              <h4 class="text-xs font-bold text-white truncate">Daredevil: Born Again</h4>
+              <p class="text-[10px] text-slate-400 mt-0.5">Series</p>
+            </div>
+          </div>
+
+          <!-- کارت ۴: Attack on Titan -->
+          <div class="group relative bg-[#0e131d] border border-white/5 rounded-2xl overflow-hidden hover:border-amber-500/50 transition duration-300">
+            <div class="relative aspect-[2/3] overflow-hidden bg-slate-900">
+              <img 
+                src="https://static.tvmaze.com/uploads/images/medium_portrait/1/4089.jpg" 
+                alt="Attack on Titan Special"
+                class="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+              >
+              <span class="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-white/10 backdrop-blur-md border border-white/10 text-white font-black text-[10px]">In 25 Days</span>
+            </div>
+            <div class="p-3">
+              <h4 class="text-xs font-bold text-white truncate">Attack on Titan (Movie)</h4>
+              <p class="text-[10px] text-slate-400 mt-0.5">Anime</p>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ۶. فوتر سینمایی مدرن شبیه CineNest -->
+  <footer class="bg-[#05070a] border-t border-white/5 pt-16 pb-12 px-6">
+    <div class="max-w-7xl mx-auto">
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pb-12 border-b border-white/5">
+        
+        <div class="lg:col-span-2 space-y-4">
+          <a href="#" class="text-2xl font-black tracking-tight text-white flex items-center gap-2">
+            <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-amber-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-amber-500/20">
+              <span class="text-sm">✦</span>
+            </div>
+            CineDex
+          </a>
+          <p class="text-xs sm:text-sm text-slate-400 leading-relaxed max-w-sm" data-i18n="footer_bio">
+            Your ultimate destination for discovering and streaming the best movies and TV shows from around the world.
+          </p>
+
+          <div class="flex items-center gap-3 pt-2">
+            <a href="#" class="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition">📸</a>
+            <a href="#" class="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition">✈️</a>
+            <a href="#" class="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition">💬</a>
+          </div>
+        </div>
+
+        <div>
+          <h4 class="text-xs font-bold text-amber-400 uppercase tracking-wider mb-4" data-i18n="quick_links">Quick Links</h4>
+          <ul class="space-y-2.5 text-xs text-slate-400">
+            <li><button onclick="scrollToUniverse()" class="hover:text-white transition">Genre Universe</button></li>
+            <li><button onclick="setTab('all')" class="hover:text-white transition">Discover Series</button></li>
+            <li><button onclick="setTab('watchlist')" class="hover:text-white transition">Watchlist</button></li>
+            <li><button onclick="scrollToUpcoming()" class="hover:text-white transition">Calendar</button></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="text-xs font-bold text-amber-400 uppercase tracking-wider mb-4" data-i18n="support_links">Support</h4>
+          <ul class="space-y-2.5 text-xs text-slate-400">
+            <li><a href="#" class="hover:text-white transition">Help Center</a></li>
+            <li><a href="#" class="hover:text-white transition">FAQ</a></li>
+            <li><a href="#" class="hover:text-white transition">Privacy Policy</a></li>
+            <li><a href="#" class="hover:text-white transition">Terms of Service</a></li>
+          </ul>
+        </div>
+
+        <div class="space-y-4">
+          <h4 class="text-xs font-bold text-amber-400 uppercase tracking-wider" data-i18n="contact_us">Contact Us</h4>
+          <p class="text-xs text-slate-400">support.cinedex@gmail.com</p>
+
+          <a href="#" class="inline-flex items-center justify-between w-full px-4 py-3 rounded-2xl bg-[#f59e0b] hover:bg-[#d97706] text-slate-950 font-bold text-xs transition shadow-lg shadow-amber-500/20 group">
+            <span class="flex items-center gap-2">
+              <span class="text-base">☕</span>
+              <span>Support Us<br><span class="text-[10px] font-normal opacity-80">Buy us a coffee!</span></span>
+            </span>
+            <span class="group-hover:translate-x-1 transition">→</span>
+          </a>
+
+          <div class="pt-2">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-white/5 border border-white/5 text-[11px] text-slate-400 font-medium">
+              🌐 Web App
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+        <p>© 2026 CineDex. All rights reserved.</p>
+        <p>Made with <span class="text-amber-400">💛</span> by CineDex Team</p>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- مودال جزئیات اپیزودها -->
+  <div id="details-modal" class="fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-4 hidden backdrop-blur-md">
+    <div class="bg-[#0c1017] border border-white/10 rounded-2xl max-w-3xl w-full max-h-[90vh] flex flex-col overflow-hidden shadow-2xl relative">
+      <button onclick="closeDetailsModal()" class="absolute top-4 right-4 z-20 w-8 h-8 rounded-full bg-black/60 border border-white/10 flex items-center justify-center text-slate-300 hover:text-white transition">✕</button>
+
+      <div class="relative p-6 border-b border-white/5 bg-gradient-to-b from-white/[0.03] to-transparent flex gap-5 items-center">
+        <img id="modal-poster" src="" class="w-20 h-28 object-cover rounded-xl shadow-lg border border-white/10 shrink-0">
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2">
+            <h2 id="modal-title" class="text-xl sm:text-2xl font-bold text-white truncate"></h2>
+            <span id="modal-rating" class="text-xs px-2 py-0.5 rounded-lg bg-amber-500/20 text-amber-400 border border-amber-500/30 font-bold"></span>
+          </div>
+          <p id="modal-overview" class="text-xs text-slate-400 mt-2 line-clamp-2"></p>
+          
+          <div class="mt-3 flex items-center gap-3">
+            <div class="flex-1 bg-white/5 h-2 rounded-full overflow-hidden border border-white/5">
+              <div id="modal-progress-bar" class="bg-indigo-500 h-full w-0 transition-all duration-500"></div>
+            </div>
+            <span id="modal-progress-text" class="text-xs text-indigo-400 font-semibold shrink-0">0% Watched</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="modal-seasons-tabs" class="flex items-center gap-2 px-6 py-3 border-b border-white/5 overflow-x-auto text-xs"></div>
+      <div id="modal-episodes-list" class="flex-1 overflow-y-auto p-6 space-y-2.5">
+        <p class="text-center text-xs text-slate-500 py-8">Loading episodes...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- مودال ورود و ثبت نام -->
+  <div id="auth-modal" class="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4 hidden backdrop-blur-sm">
+    <div class="bg-[#0f131c] border border-white/10 rounded-2xl max-w-md w-full p-8 relative shadow-2xl">
+      <button onclick="closeAuthModal()" class="absolute right-4 top-4 text-slate-400 hover:text-white text-lg">✕</button>
+      
+      <h2 id="auth-title" class="text-2xl font-bold text-white mb-2" data-i18n="auth_login_title">Sign In to CineDex</h2>
+      <p id="auth-subtitle" class="text-xs text-slate-400 mb-6" data-i18n="auth_login_sub">Manage your favorites, watchlist and watch history</p>
+
+      <div class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1" data-i18n="auth_user">Username</label>
+          <input id="auth-username" type="text" placeholder="Enter username..." class="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm focus:outline-none focus:border-indigo-500 text-white placeholder-slate-500">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1" data-i18n="auth_pass">Password</label>
+          <input id="auth-password" type="password" placeholder="••••••••" class="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm focus:outline-none focus:border-indigo-500 text-white placeholder-slate-500">
+        </div>
+
+        <button onclick="submitAuth()" id="auth-submit-btn" class="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold rounded-xl text-sm transition mt-2 shadow-lg shadow-amber-500/20" data-i18n="btn_signin">
+          Sign In
+        </button>
+
+        <p class="text-center text-xs text-slate-400 mt-4">
+          <span id="auth-switch-text" data-i18n="auth_no_account">Don't have an account?</span>
+          <button onclick="toggleAuthMode()" id="auth-switch-btn" class="text-amber-400 font-semibold hover:underline ml-1" data-i18n="auth_create_one">Create one</button>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
