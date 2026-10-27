@@ -10,33 +10,470 @@
     body {
       background-color: #0b0f19;
       color: #f3f4f6;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-family: system-ui, -apple-system, sans-serif;
+      margin: 0;
+      padding: 0;
     }
-    .poster-glow {
-      box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.9), 0 0 20px rgba(245, 158, 11, 0.15);
-    }
-    .hero-container {
-      position: relative;
-      transition: background-image 0.7s ease-in-out;
+    .hero-box {
+      min-height: 380px;
       background-size: cover;
       background-position: center;
+      transition: background-image 0.5s ease-in-out;
     }
-    .hero-overlay {
-      background: linear-gradient(90deg, rgba(11,15,25,0.98) 0%, rgba(11,15,25,0.85) 45%, rgba(11,15,25,0.6) 100%),
+    .hero-grad {
+      background: linear-gradient(90deg, rgba(11,15,25,0.95) 0%, rgba(11,15,25,0.8) 50%, rgba(11,15,25,0.4) 100%),
                   linear-gradient(180deg, rgba(11,15,25,0.2) 0%, rgba(11,15,25,1) 100%);
-    }
-    .fade-anim {
-      animation: fadeIn 0.6s ease-in-out;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(6px); }
-      to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between selection:bg-amber-500 selection:text-black">
 
   <!-- NAVBAR -->
-  <header class="border-b border-gray-800/80 sticky top-0 z-40 bg-[#0b0f19]/90 backdrop-blur-md">
+  <header class="border-b border-gray-800 sticky top-0 z-40 bg-[#0b0f19]/95 backdrop-blur-md">
     <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
-      <div class="flex items-center
+      <div class="flex items-center gap-6">
+        <a href="#" class="flex items-center gap-2 text-2xl font-black text-white">
+          <span class="w-8 h-8 rounded-lg bg-amber-500 flex items-center justify-center text-black font-black text-lg">C</span>
+          Cine<span class="text-amber-400">Dex</span>
+        </a>
+        <nav class="hidden md:flex items-center gap-5 text-sm font-medium text-gray-400">
+          <button onclick="setTab('all')" class="hover:text-amber-400 transition-colors cursor-pointer"><i class="fa-solid fa-compass mr-1"></i> Discover</button>
+          <button onclick="setTab('dexter')" class="hover:text-amber-400 transition-colors cursor-pointer"><i class="fa-solid fa-skull mr-1 text-red-500"></i> Dexter Universe</button>
+          <button onclick="setTab('favorites')" class="hover:text-amber-400 transition-colors cursor-pointer"><i class="fa-solid fa-heart mr-1 text-pink-500"></i> Favorites</button>
+        </nav>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <div class="relative hidden sm:block w-60">
+          <input 
+            type="text" 
+            id="searchInput"
+            placeholder="Search TV shows..." 
+            class="w-full bg-gray-900 border border-gray-700 rounded-full py-1.5 pl-9 pr-4 text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-amber-500"
+            oninput="handleSearch(this.value)"
+          />
+          <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-xs text-gray-500"></i>
+        </div>
+
+        <button 
+          id="authBtn"
+          onclick="openAuthModal()" 
+          class="bg-amber-500 hover:bg-amber-400 text-black text-sm font-bold px-5 py-2 rounded-full transition-all shadow-md shadow-amber-500/20 flex items-center gap-2 cursor-pointer">
+          <i class="fa-solid fa-user"></i>
+          <span>Sign In</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO SPOTLIGHT -->
+  <section id="heroSection" class="hero-box border-b border-gray-800 relative" style="background-image: url('https://m.media-amazon.com/images/M/MV5BMTc5NTM5OTY0Nl5BMl5BanBnXkFtZTgwNjg2NzYzOTE@._V1_SX500.jpg');">
+    <div class="hero-grad w-full h-full py-10 px-4 flex items-center">
+      <div class="max-w-7xl mx-auto w-full flex flex-col md:flex-row items-center justify-between gap-8">
+        
+        <div class="flex-1 space-y-4">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-semibold uppercase">
+            <i class="fa-solid fa-fire text-[10px]"></i> Spotlight Pick
+          </div>
+          <h1 id="heroTitle" class="text-4xl sm:text-5xl font-black text-white">Dexter</h1>
+          
+          <div class="flex items-center gap-3 text-xs sm:text-sm text-gray-300 font-medium">
+            <span id="heroRating" class="text-amber-400 font-bold bg-black/60 px-2 py-0.5 rounded border border-amber-500/30">
+              <i class="fa-solid fa-star"></i> 8.7
+            </span>
+            <span>•</span>
+            <span id="heroYear">2006</span>
+            <span>•</span>
+            <span id="heroSeasons" class="px-2 py-0.5 rounded bg-gray-800 text-gray-300">8 Seasons</span>
+          </div>
+
+          <p id="heroOverview" class="text-gray-300 text-sm sm:text-base leading-relaxed max-w-2xl line-clamp-3">
+            Dexter Morgan is a forensics expert for the Miami Metro Police Department who spends his nights tracking down and killing criminals.
+          </p>
+
+          <div class="flex items-center gap-3 pt-2">
+            <button onclick="toggleHeroFavorite()" class="bg-amber-500 hover:bg-amber-400 text-black px-5 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center gap-2 cursor-pointer shadow-lg shadow-amber-500/20">
+              <i class="fa-solid fa-heart" id="heroHeart"></i> <span>Add to Favorites</span>
+            </button>
+            <div class="flex items-center gap-1.5 ml-2">
+              <button onclick="prevHeroSlide()" class="w-9 h-9 rounded-xl bg-gray-900 border border-gray-700 text-gray-300 hover:text-white flex items-center justify-center cursor-pointer">
+                <i class="fa-solid fa-chevron-left text-xs"></i>
+              </button>
+              <button onclick="nextHeroSlide()" class="w-9 h-9 rounded-xl bg-gray-900 border border-gray-700 text-gray-300 hover:text-white flex items-center justify-center cursor-pointer">
+                <i class="fa-solid fa-chevron-right text-xs"></i>
+              </button>
+            </div>
+            <span id="heroSlideIndicator" class="text-xs text-gray-500 font-mono ml-1">1 / 3</span>
+          </div>
+        </div>
+
+        <div class="w-40 sm:w-56 shrink-0">
+          <img 
+            id="heroPoster"
+            src="https://m.media-amazon.com/images/M/MV5BMTc5NTM5OTY0Nl5BMl5BanBnXkFtZTgwNjg2NzYzOTE@._V1_SX500.jpg" 
+            alt="Show Poster" 
+            class="w-full rounded-2xl border border-gray-700 shadow-2xl object-cover aspect-[2/3]"
+          />
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- MAIN CATALOG -->
+  <main class="max-w-7xl mx-auto px-4 py-8 w-full flex-1">
+    <div class="flex items-center justify-between mb-6 pb-3 border-b border-gray-800 flex-wrap gap-4">
+      <div class="flex items-center gap-2 overflow-x-auto">
+        <button id="tab-all" onclick="setTab('all')" class="px-4 py-2 rounded-xl text-sm font-bold bg-amber-500 text-black transition-all cursor-pointer">
+          All Shows
+        </button>
+        <button id="tab-dexter" onclick="setTab('dexter')" class="px-4 py-2 rounded-xl text-sm font-semibold bg-gray-900 text-gray-400 hover:text-white border border-gray-800 transition-all cursor-pointer">
+          Dexter Universe
+        </button>
+        <button id="tab-favorites" onclick="setTab('favorites')" class="px-4 py-2 rounded-xl text-sm font-semibold bg-gray-900 text-gray-400 hover:text-white border border-gray-800 transition-all cursor-pointer">
+          Favorites (<span id="favCount">0</span>)
+        </button>
+      </div>
+
+      <div id="backendStatus" class="flex items-center gap-2 text-xs px-3 py-1.5 rounded-full bg-gray-900 border border-gray-800 text-gray-400">
+        <span class="w-2 h-2 rounded-full bg-yellow-400 animate-pulse"></span> Connecting to API...
+      </div>
+    </div>
+
+    <div class="flex items-center justify-between mb-6">
+      <h2 id="currentTabTitle" class="text-xl sm:text-2xl font-bold text-white flex items-center gap-3">
+        <span>All Shows</span>
+        <span id="showsCount" class="text-xs bg-gray-800 text-gray-400 font-normal px-2.5 py-0.5 rounded-full">0 shows</span>
+      </h2>
+      <span class="text-xs text-gray-500">Live from FastAPI & Neon</span>
+    </div>
+
+    <div id="showsGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-6">
+      <div class="h-80 bg-gray-900/60 rounded-2xl animate-pulse border border-gray-800"></div>
+      <div class="h-80 bg-gray-900/60 rounded-2xl animate-pulse border border-gray-800"></div>
+      <div class="h-80 bg-gray-900/60 rounded-2xl animate-pulse border border-gray-800"></div>
+      <div class="h-80 bg-gray-900/60 rounded-2xl animate-pulse border border-gray-800"></div>
+    </div>
+
+    <!-- Pagination -->
+    <div id="paginationBar" class="mt-10 pt-6 border-t border-gray-800 flex items-center justify-between">
+      <button 
+        id="prevPageBtn" 
+        onclick="changePage(-1)" 
+        disabled
+        class="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-gray-900 border border-gray-800 text-gray-400 disabled:opacity-40 disabled:cursor-not-allowed hover:text-white transition-all cursor-pointer">
+        <i class="fa-solid fa-chevron-left mr-1"></i> Previous
+      </button>
+
+      <span id="pageIndicator" class="text-xs sm:text-sm text-gray-400 font-medium">Page 1 of 1</span>
+
+      <button 
+        id="nextPageBtn" 
+        onclick="changePage(1)" 
+        class="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-gray-900 border border-gray-800 text-gray-400 disabled:opacity-40 disabled:cursor-not-allowed hover:text-white transition-all cursor-pointer">
+        Next <i class="fa-solid fa-chevron-right ml-1"></i>
+      </button>
+    </div>
+  </main>
+
+  <footer class="border-t border-gray-800 bg-gray-950 py-6 text-center text-xs text-gray-500">
+    CineDex Full-Stack Application • FastAPI & PostgreSQL
+  </footer>
+
+  <!-- AUTH MODAL -->
+  <div id="authModal" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-gray-900 border border-gray-700 rounded-2xl max-w-sm w-full p-6 relative shadow-2xl">
+      <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white cursor-pointer">
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
+
+      <h3 class="text-xl font-bold text-white mb-1">Welcome to CineDex</h3>
+      <p class="text-xs text-gray-400 mb-6">Sign in to sync your watchlist</p>
+
+      <form id="authForm" onsubmit="handleAuthSubmit(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-gray-300 mb-1">Username</label>
+          <input 
+            type="text" 
+            id="authUsername" 
+            required 
+            class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-amber-500"
+            placeholder="admin"
+          />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-300 mb-1">Password</label>
+          <input 
+            type="password" 
+            id="authPassword" 
+            required 
+            class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-amber-500"
+            placeholder="••••••••"
+          />
+        </div>
+        <button 
+          type="submit" 
+          class="w-full bg-amber-500 hover:bg-amber-400 text-black font-bold py-2.5 rounded-xl text-sm transition-all mt-2 cursor-pointer">
+          Sign In
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = "https://cinedex-w9i6.onrender.com";
+    let allShows = [];
+    let spotlightShows = [];
+    let currentHeroIndex = 0;
+    let heroInterval = null;
+    let currentTab = 'all';
+    let userFavorites = JSON.parse(localStorage.getItem('cinedex_favorites') || '[]');
+    let currentPage = 1;
+    const itemsPerPage = 8;
+
+    window.openAuthModal = function() {
+      const modal = document.getElementById("authModal");
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+    };
+
+    window.closeAuthModal = function() {
+      const modal = document.getElementById("authModal");
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+    };
+
+    document.getElementById("authModal").addEventListener("click", function(e) {
+      if (e.target === this) closeAuthModal();
+    });
+
+    window.handleAuthSubmit = function(e) {
+      e.preventDefault();
+      const user = document.getElementById("authUsername").value;
+      alert(`Welcome, ${user}!`);
+      document.getElementById("authBtn").innerHTML = `<i class="fa-solid fa-circle-user text-amber-400"></i> <span>${user}</span>`;
+      closeAuthModal();
+    };
+
+    window.setTab = function(tabName) {
+      currentTab = tabName;
+      currentPage = 1;
+
+      ['all', 'dexter', 'favorites'].forEach(t => {
+        const btn = document.getElementById(`tab-${t}`);
+        if (t === tabName) {
+          btn.className = "px-4 py-2 rounded-xl text-sm font-bold bg-amber-500 text-black transition-all cursor-pointer";
+        } else {
+          btn.className = "px-4 py-2 rounded-xl text-sm font-semibold bg-gray-900 text-gray-400 hover:text-white border border-gray-800 transition-all cursor-pointer";
+        }
+      });
+
+      const titleEl = document.getElementById("currentTabTitle");
+      if (tabName === 'all') titleEl.querySelector("span").innerText = "All Shows";
+      if (tabName === 'dexter') titleEl.querySelector("span").innerText = "Dexter Universe";
+      if (tabName === 'favorites') titleEl.querySelector("span").innerText = "Your Favorites";
+
+      applyFilters();
+    };
+
+    window.toggleFavorite = function(showId) {
+      const index = userFavorites.indexOf(showId);
+      if (index > -1) {
+        userFavorites.splice(index, 1);
+      } else {
+        userFavorites.push(showId);
+      }
+      localStorage.setItem('cinedex_favorites', JSON.stringify(userFavorites));
+      updateFavCount();
+      updateHeroFavStatus();
+      applyFilters();
+    };
+
+    function updateFavCount() {
+      document.getElementById("favCount").innerText = userFavorites.length;
+    }
+
+    window.toggleHeroFavorite = function() {
+      if (!spotlightShows[currentHeroIndex]) return;
+      toggleFavorite(spotlightShows[currentHeroIndex].id);
+    };
+
+    function updateHeroFavStatus() {
+      if (!spotlightShows[currentHeroIndex]) return;
+      const isFav = userFavorites.includes(spotlightShows[currentHeroIndex].id);
+      const heart = document.getElementById("heroHeart");
+      heart.className = isFav ? "fa-solid fa-heart text-red-500" : "fa-solid fa-heart";
+    }
+
+    async function fetchShows() {
+      const statusBadge = document.getElementById("backendStatus");
+      const grid = document.getElementById("showsGrid");
+
+      try {
+        const response = await fetch(`${API_BASE}/shows`);
+        if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
+        
+        const data = await response.json();
+        allShows = Array.isArray(data) ? data : (data.results || []);
+        
+        statusBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500"></span> Neon DB Connected`;
+        
+        spotlightShows = allShows.slice(0, 5);
+        if (spotlightShows.length > 0) {
+          setupHeroCarousel();
+        }
+
+        updateFavCount();
+        applyFilters();
+      } catch (err) {
+        console.error("API Fetch Error:", err);
+        statusBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-red-500"></span> Backend Offline`;
+        grid.innerHTML = `
+          <div class="col-span-full py-12 text-center text-gray-500">
+            <i class="fa-solid fa-circle-exclamation text-3xl text-amber-500/50 mb-3"></i>
+            <p class="text-sm">Could not fetch shows from API.</p>
+            <button onclick="fetchShows()" class="mt-4 px-4 py-1.5 bg-gray-800 text-gray-300 hover:text-white rounded-lg text-xs cursor-pointer">Retry</button>
+          </div>
+        `;
+      }
+    }
+
+    function setupHeroCarousel() {
+      renderHeroSlide(currentHeroIndex);
+      if (heroInterval) clearInterval(heroInterval);
+      heroInterval = setInterval(() => {
+        nextHeroSlide();
+      }, 5000);
+    }
+
+    function renderHeroSlide(index) {
+      const show = spotlightShows[index];
+      if (!show) return;
+
+      const heroSec = document.getElementById("heroSection");
+      const imgUrl = show.backdrop_path || show.poster_path || '';
+      if (imgUrl) {
+        heroSec.style.backgroundImage = `url('${imgUrl}')`;
+      }
+
+      document.getElementById("heroTitle").innerText = show.title || "Unknown";
+      document.getElementById("heroRating").innerHTML = `<i class="fa-solid fa-star"></i> ${show.vote_average || 'N/A'}`;
+      document.getElementById("heroYear").innerText = show.first_air_date ? show.first_air_date.split('-')[0] : 'Series';
+      document.getElementById("heroSeasons").innerText = `${show.total_seasons || 1} Seasons`;
+      document.getElementById("heroOverview").innerText = show.overview || "";
+
+      const poster = document.getElementById("heroPoster");
+      poster.src = show.poster_path || imgUrl;
+      poster.onerror = function() {
+        this.src = 'https://via.placeholder.com/300x450?text=CineDex';
+      };
+
+      document.getElementById("heroSlideIndicator").innerText = `${index + 1} / ${spotlightShows.length}`;
+      updateHeroFavStatus();
+    }
+
+    window.nextHeroSlide = function() {
+      if (spotlightShows.length === 0) return;
+      currentHeroIndex = (currentHeroIndex + 1) % spotlightShows.length;
+      renderHeroSlide(currentHeroIndex);
+    };
+
+    window.prevHeroSlide = function() {
+      if (spotlightShows.length === 0) return;
+      currentHeroIndex = (currentHeroIndex - 1 + spotlightShows.length) % spotlightShows.length;
+      renderHeroSlide(currentHeroIndex);
+    };
+
+    function applyFilters() {
+      let filtered = [...allShows];
+
+      if (currentTab === 'dexter') {
+        filtered = filtered.filter(s => (s.title && s.title.toLowerCase().includes('dexter')) || (s.overview && s.overview.toLowerCase().includes('dexter')));
+      } else if (currentTab === 'favorites') {
+        filtered = filtered.filter(s => userFavorites.includes(s.id));
+      }
+
+      const q = document.getElementById("searchInput").value.toLowerCase().trim();
+      if (q) {
+        filtered = filtered.filter(s => 
+          (s.title && s.title.toLowerCase().includes(q)) || 
+          (s.overview && s.overview.toLowerCase().includes(q))
+        );
+      }
+
+      document.getElementById("showsCount").innerText = `${filtered.length} shows`;
+
+      const totalPages = Math.ceil(filtered.length / itemsPerPage) || 1;
+      if (currentPage > totalPages) currentPage = totalPages;
+
+      const startIndex = (currentPage - 1) * itemsPerPage;
+      const paginatedItems = filtered.slice(startIndex, startIndex + itemsPerPage);
+
+      document.getElementById("pageIndicator").innerText = `Page ${currentPage} of ${totalPages}`;
+      document.getElementById("prevPageBtn").disabled = currentPage === 1;
+      document.getElementById("nextPageBtn").disabled = currentPage >= totalPages;
+
+      renderCards(paginatedItems);
+    }
+
+    window.changePage = function(delta) {
+      currentPage += delta;
+      applyFilters();
+      window.scrollTo({ top: 400, behavior: 'smooth' });
+    };
+
+    function renderCards(shows) {
+      const grid = document.getElementById("showsGrid");
+      if (!shows || shows.length === 0) {
+        grid.innerHTML = `<div class="col-span-full text-center py-12 text-gray-500 text-sm">No shows found.</div>`;
+        return;
+      }
+
+      grid.innerHTML = shows.map(show => {
+        const isFav = userFavorites.includes(show.id);
+        const posterUrl = show.poster_path || 'https://via.placeholder.com/300x450?text=CineDex';
+
+        return `
+          <div class="group bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden hover:border-amber-500/50 transition-all flex flex-col justify-between hover:shadow-xl hover:shadow-black">
+            <div class="relative overflow-hidden aspect-[2/3] bg-gray-950">
+              <img 
+                src="${posterUrl}" 
+                alt="${show.title}" 
+                loading="lazy"
+                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                onerror="this.src='https://via.placeholder.com/300x450?text=CineDex'"
+              />
+              <div class="absolute top-2 right-2 bg-black/80 backdrop-blur-md px-2 py-0.5 rounded-md text-xs font-bold text-amber-400 flex items-center gap-1 border border-amber-500/20">
+                <i class="fa-solid fa-star text-[10px]"></i> ${show.vote_average || 'N/A'}
+              </div>
+              <button 
+                onclick="toggleFavorite(${show.id})"
+                class="absolute top-2 left-2 w-8 h-8 rounded-full bg-black/70 backdrop-blur-md flex items-center justify-center text-xs transition-colors hover:scale-110 cursor-pointer ${isFav ? 'text-red-500' : 'text-gray-300'}">
+                <i class="fa-solid fa-heart"></i>
+              </button>
+              ${show.total_seasons ? `<div class="absolute bottom-2 left-2 bg-black/70 backdrop-blur-sm px-2 py-0.5 rounded text-[10px] text-gray-300 border border-gray-700">${show.total_seasons} Seasons</div>` : ''}
+            </div>
+            <div class="p-4 flex-1 flex flex-col justify-between gap-3">
+              <div>
+                <h3 class="font-bold text-white text-base group-hover:text-amber-400 transition-colors line-clamp-1">${show.title}</h3>
+                <p class="text-xs text-gray-400 mt-1 line-clamp-2">${show.overview || 'No description available.'}</p>
+              </div>
+              <div class="pt-2 border-t border-gray-800 flex items-center justify-between text-xs text-gray-500">
+                <span>${show.first_air_date ? show.first_air_date.split('-')[0] : 'Series'}</span>
+                <span class="text-amber-500 font-medium">${show.total_episodes ? show.total_episodes + ' Eps' : 'TV'}</span>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    window.handleSearch = function(query) {
+      currentPage = 1;
+      applyFilters();
+    };
+
+    window.addEventListener("DOMContentLoaded", fetchShows);
+  </script>
+</body>
+</html>
