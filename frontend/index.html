@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,45 +10,70 @@
     body {
       background-color: #0b0f19;
       color: #f3f4f6;
-      font-family: system-ui, -apple-system, sans-serif;
-      margin: 0;
-      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
-    .hero-box {
-      min-height: 380px;
+    .hero-bg {
+      min-height: 420px;
       background-size: cover;
-      background-position: center;
-      transition: background-image 0.5s ease-in-out;
+      background-position: center 25%;
+      transition: background-image 0.6s ease-in-out;
     }
     .hero-grad {
-      background: linear-gradient(90deg, rgba(11,15,25,0.95) 0%, rgba(11,15,25,0.8) 50%, rgba(11,15,25,0.4) 100%),
+      background: linear-gradient(90deg, rgba(11,15,25,0.96) 0%, rgba(11,15,25,0.85) 45%, rgba(11,15,25,0.4) 100%),
                   linear-gradient(180deg, rgba(11,15,25,0.2) 0%, rgba(11,15,25,1) 100%);
+    }
+    .poster-glow {
+      box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.9), 0 0 25px rgba(245, 158, 11, 0.2);
+    }
+    .fade-anim {
+      animation: fadeIn 0.4s ease-in-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between selection:bg-amber-500 selection:text-black">
 
   <!-- NAVBAR -->
-  <header class="border-b border-gray-800 sticky top-0 z-40 bg-[#0b0f19]/95 backdrop-blur-md">
+  <header class="border-b border-gray-800/80 sticky top-0 z-40 bg-[#0b0f19]/90 backdrop-blur-md">
     <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
       <div class="flex items-center gap-6">
-        <a href="#" class="flex items-center gap-2 text-2xl font-black text-white">
+        <a href="#" onclick="location.reload()" class="flex items-center gap-2 text-2xl font-black text-white">
           <span class="w-8 h-8 rounded-lg bg-amber-500 flex items-center justify-center text-black font-black text-lg">C</span>
           Cine<span class="text-amber-400">Dex</span>
         </a>
         <nav class="hidden md:flex items-center gap-5 text-sm font-medium text-gray-400">
-          <button onclick="setTab('all')" class="hover:text-amber-400 transition-colors cursor-pointer"><i class="fa-solid fa-compass mr-1"></i> Discover</button>
-          <button onclick="setTab('dexter')" class="hover:text-amber-400 transition-colors cursor-pointer"><i class="fa-solid fa-skull mr-1 text-red-500"></i> Dexter Universe</button>
-          <button onclick="setTab('favorites')" class="hover:text-amber-400 transition-colors cursor-pointer"><i class="fa-solid fa-heart mr-1 text-pink-500"></i> Favorites</button>
+          <button onclick="setTab('all')" class="hover:text-amber-400 transition-colors cursor-pointer" data-i18n="nav_discover">
+            <i class="fa-solid fa-compass mr-1"></i> Discover
+          </button>
+          <button onclick="setTab('watchlist')" class="hover:text-amber-400 transition-colors cursor-pointer" data-i18n="nav_watchlist">
+            <i class="fa-solid fa-bookmark mr-1 text-blue-400"></i> Watchlist
+          </button>
+          <button onclick="setTab('loved')" class="hover:text-amber-400 transition-colors cursor-pointer" data-i18n="nav_loved">
+            <i class="fa-solid fa-heart mr-1 text-rose-500"></i> Loved
+          </button>
+          <button onclick="setTab('hated')" class="hover:text-amber-400 transition-colors cursor-pointer" data-i18n="nav_hated">
+            <i class="fa-solid fa-thumbs-down mr-1 text-gray-400"></i> Hated
+          </button>
         </nav>
       </div>
 
       <div class="flex items-center gap-3">
-        <div class="relative hidden sm:block w-60">
+        <!-- Language Switcher -->
+        <button 
+          onclick="toggleLanguage()" 
+          class="bg-gray-800 hover:bg-gray-700 text-xs font-bold px-3 py-1.5 rounded-lg border border-gray-700 text-gray-300 transition-all flex items-center gap-1.5 cursor-pointer">
+          <i class="fa-solid fa-globe text-amber-400"></i>
+          <span id="langLabel">FA</span>
+        </button>
+
+        <div class="relative hidden sm:block w-56">
           <input 
             type="text" 
             id="searchInput"
-            placeholder="Search TV shows..." 
+            placeholder="Search series..." 
             class="w-full bg-gray-900 border border-gray-700 rounded-full py-1.5 pl-9 pr-4 text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-amber-500"
             oninput="handleSearch(this.value)"
           />
@@ -58,26 +83,47 @@
         <button 
           id="authBtn"
           onclick="openAuthModal()" 
-          class="bg-amber-500 hover:bg-amber-400 text-black text-sm font-bold px-5 py-2 rounded-full transition-all shadow-md shadow-amber-500/20 flex items-center gap-2 cursor-pointer">
+          class="bg-amber-500 hover:bg-amber-400 text-black text-sm font-bold px-4 py-2 rounded-full transition-all shadow-md shadow-amber-500/20 flex items-center gap-2 cursor-pointer">
           <i class="fa-solid fa-user"></i>
-          <span>Sign In</span>
+          <span data-i18n="btn_signin">Sign In</span>
         </button>
       </div>
     </div>
   </header>
 
-  <!-- HERO SPOTLIGHT -->
-  <section id="heroSection" class="hero-box border-b border-gray-800 relative" style="background-image: url('https://m.media-amazon.com/images/M/MV5BMTc5NTM5OTY0Nl5BMl5BanBnXkFtZTgwNjg2NzYzOTE@._V1_SX500.jpg');">
-    <div class="hero-grad w-full h-full py-10 px-4 flex items-center">
+  <!-- WATCH TIME STATS BANNER -->
+  <div class="bg-gray-900/60 border-b border-gray-800/80 px-4 py-3">
+    <div class="max-w-7xl mx-auto flex items-center justify-between flex-wrap gap-4 text-xs sm:text-sm">
+      <div class="flex items-center gap-3">
+        <span class="w-8 h-8 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
+          <i class="fa-solid fa-stopwatch"></i>
+        </span>
+        <div>
+          <span class="text-gray-400" data-i18n="time_watched_label">Total Screen Time:</span>
+          <span id="totalWatchTime" class="font-bold text-amber-400 ml-1">0h 0m</span>
+          <span class="text-gray-500 text-xs ml-1" data-i18n="time_watched_sub">(based on Loved shows)</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-4 text-xs text-gray-400">
+        <div><i class="fa-solid fa-heart text-rose-500 mr-1"></i> <span id="lovedCountBadge">0</span> <span data-i18n="stat_loved">Loved</span></div>
+        <div><i class="fa-solid fa-bookmark text-blue-400 mr-1"></i> <span id="watchlistCountBadge">0</span> <span data-i18n="stat_watchlist">Plan to Watch</span></div>
+        <div><i class="fa-solid fa-thumbs-down text-gray-500 mr-1"></i> <span id="hatedCountBadge">0</span> <span data-i18n="stat_hated">Hated</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HERO DYNAMIC SPOTLIGHT -->
+  <section id="heroSection" class="hero-bg border-b border-gray-800/80 relative" style="background-image: url('https://static.tvmaze.com/uploads/images/original_untouched/173/433430.jpg');">
+    <div class="hero-grad w-full h-full py-12 px-4 flex items-center">
       <div class="max-w-7xl mx-auto w-full flex flex-col md:flex-row items-center justify-between gap-8">
         
-        <div class="flex-1 space-y-4">
+        <div class="flex-1 space-y-4 fade-anim" id="heroTextContainer">
           <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-semibold uppercase">
-            <i class="fa-solid fa-fire text-[10px]"></i> Spotlight Pick
+            <i class="fa-solid fa-fire text-[10px]"></i> <span data-i18n="spotlight_badge">Spotlight Pick</span>
           </div>
-          <h1 id="heroTitle" class="text-4xl sm:text-5xl font-black text-white">Dexter</h1>
+          <h1 id="heroTitle" class="text-4xl sm:text-6xl font-black text-white drop-shadow-md">Dexter</h1>
           
-          <div class="flex items-center gap-3 text-xs sm:text-sm text-gray-300 font-medium">
+          <div class="flex items-center gap-3 text-xs sm:text-sm text-gray-300 font-medium flex-wrap">
             <span id="heroRating" class="text-amber-400 font-bold bg-black/60 px-2 py-0.5 rounded border border-amber-500/30">
               <i class="fa-solid fa-star"></i> 8.7
             </span>
@@ -88,31 +134,34 @@
           </div>
 
           <p id="heroOverview" class="text-gray-300 text-sm sm:text-base leading-relaxed max-w-2xl line-clamp-3">
-            Dexter Morgan is a forensics expert for the Miami Metro Police Department who spends his nights tracking down and killing criminals.
+            Dexter Morgan leads a double life as a forensic analyst and a vigilante serial killer who targets murderers who have slipped through the justice system.
           </p>
 
-          <div class="flex items-center gap-3 pt-2">
-            <button onclick="toggleHeroFavorite()" class="bg-amber-500 hover:bg-amber-400 text-black px-5 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center gap-2 cursor-pointer shadow-lg shadow-amber-500/20">
-              <i class="fa-solid fa-heart" id="heroHeart"></i> <span>Add to Favorites</span>
+          <div class="flex items-center gap-3 pt-3 flex-wrap">
+            <button onclick="toggleHeroList('loved')" class="bg-amber-500 hover:bg-amber-400 text-black px-5 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center gap-2 cursor-pointer shadow-lg shadow-amber-500/20">
+              <i class="fa-solid fa-heart" id="heroHeart"></i> <span data-i18n="btn_love_show">Mark as Loved</span>
             </button>
-            <div class="flex items-center gap-1.5 ml-2">
-              <button onclick="prevHeroSlide()" class="w-9 h-9 rounded-xl bg-gray-900 border border-gray-700 text-gray-300 hover:text-white flex items-center justify-center cursor-pointer">
+            <button onclick="toggleHeroList('watchlist')" class="bg-gray-900 hover:bg-gray-800 text-white border border-gray-700 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all flex items-center gap-2 cursor-pointer">
+              <i class="fa-solid fa-bookmark" id="heroBookmark"></i> <span data-i18n="btn_add_watchlist">Add to Watchlist</span>
+            </button>
+            <div class="flex items-center gap-2 ml-2">
+              <button onclick="prevHeroSlide()" class="w-10 h-10 rounded-xl bg-gray-900 border border-gray-700 text-gray-300 hover:text-white flex items-center justify-center cursor-pointer">
                 <i class="fa-solid fa-chevron-left text-xs"></i>
               </button>
-              <button onclick="nextHeroSlide()" class="w-9 h-9 rounded-xl bg-gray-900 border border-gray-700 text-gray-300 hover:text-white flex items-center justify-center cursor-pointer">
+              <button onclick="nextHeroSlide()" class="w-10 h-10 rounded-xl bg-gray-900 border border-gray-700 text-gray-300 hover:text-white flex items-center justify-center cursor-pointer">
                 <i class="fa-solid fa-chevron-right text-xs"></i>
               </button>
             </div>
-            <span id="heroSlideIndicator" class="text-xs text-gray-500 font-mono ml-1">1 / 3</span>
+            <span id="heroSlideIndicator" class="text-xs text-gray-400 font-mono ml-1">1 / 3</span>
           </div>
         </div>
 
-        <div class="w-40 sm:w-56 shrink-0">
+        <div class="w-44 sm:w-60 shrink-0 fade-anim" id="heroPosterContainer">
           <img 
             id="heroPoster"
-            src="https://m.media-amazon.com/images/M/MV5BMTc5NTM5OTY0Nl5BMl5BanBnXkFtZTgwNjg2NzYzOTE@._V1_SX500.jpg" 
+            src="https://static.tvmaze.com/uploads/images/medium_portrait/173/433430.jpg" 
             alt="Show Poster" 
-            class="w-full rounded-2xl border border-gray-700 shadow-2xl object-cover aspect-[2/3]"
+            class="w-full rounded-2xl border border-gray-700/80 poster-glow object-cover aspect-[2/3]"
           />
         </div>
 
@@ -122,38 +171,40 @@
 
   <!-- MAIN CATALOG -->
   <main class="max-w-7xl mx-auto px-4 py-8 w-full flex-1">
+    
+    <!-- Navigation Tabs -->
     <div class="flex items-center justify-between mb-6 pb-3 border-b border-gray-800 flex-wrap gap-4">
       <div class="flex items-center gap-2 overflow-x-auto">
         <button id="tab-all" onclick="setTab('all')" class="px-4 py-2 rounded-xl text-sm font-bold bg-amber-500 text-black transition-all cursor-pointer">
-          All Shows
+          <i class="fa-solid fa-compass mr-1"></i> <span data-i18n="tab_all">Discover</span>
         </button>
-        <button id="tab-dexter" onclick="setTab('dexter')" class="px-4 py-2 rounded-xl text-sm font-semibold bg-gray-900 text-gray-400 hover:text-white border border-gray-800 transition-all cursor-pointer">
-          Dexter Universe
+        <button id="tab-watchlist" onclick="setTab('watchlist')" class="px-4 py-2 rounded-xl text-sm font-semibold bg-gray-900 text-gray-400 hover:text-white border border-gray-800 transition-all cursor-pointer">
+          <i class="fa-solid fa-bookmark mr-1 text-blue-400"></i> <span data-i18n="tab_watchlist">Watchlist</span> (<span id="tWatchCount">0</span>)
         </button>
-        <button id="tab-favorites" onclick="setTab('favorites')" class="px-4 py-2 rounded-xl text-sm font-semibold bg-gray-900 text-gray-400 hover:text-white border border-gray-800 transition-all cursor-pointer">
-          Favorites (<span id="favCount">0</span>)
+        <button id="tab-loved" onclick="setTab('loved')" class="px-4 py-2 rounded-xl text-sm font-semibold bg-gray-900 text-gray-400 hover:text-white border border-gray-800 transition-all cursor-pointer">
+          <i class="fa-solid fa-heart mr-1 text-rose-500"></i> <span data-i18n="tab_loved">Loved</span> (<span id="tLovedCount">0</span>)
+        </button>
+        <button id="tab-hated" onclick="setTab('hated')" class="px-4 py-2 rounded-xl text-sm font-semibold bg-gray-900 text-gray-400 hover:text-white border border-gray-800 transition-all cursor-pointer">
+          <i class="fa-solid fa-thumbs-down mr-1 text-gray-400"></i> <span data-i18n="tab_hated">Hated</span> (<span id="tHatedCount">0</span>)
         </button>
       </div>
 
-      <div id="backendStatus" class="flex items-center gap-2 text-xs px-3 py-1.5 rounded-full bg-gray-900 border border-gray-800 text-gray-400">
-        <span class="w-2 h-2 rounded-full bg-yellow-400 animate-pulse"></span> Connecting to API...
+      <div id="backendStatus" class="flex items-center gap-2 text-xs px-3 py-1.5 rounded-full bg-gray-900 border border-gray-800 text-emerald-400">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Neon DB Connected
       </div>
     </div>
 
+    <!-- Active Tab Header -->
     <div class="flex items-center justify-between mb-6">
       <h2 id="currentTabTitle" class="text-xl sm:text-2xl font-bold text-white flex items-center gap-3">
-        <span>All Shows</span>
+        <span id="tabHeadingText">Discover</span>
         <span id="showsCount" class="text-xs bg-gray-800 text-gray-400 font-normal px-2.5 py-0.5 rounded-full">0 shows</span>
       </h2>
-      <span class="text-xs text-gray-500">Live from FastAPI & Neon</span>
+      <span class="text-xs text-gray-500" data-i18n="db_live_notice">Live FastAPI & Neon</span>
     </div>
 
-    <div id="showsGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-6">
-      <div class="h-80 bg-gray-900/60 rounded-2xl animate-pulse border border-gray-800"></div>
-      <div class="h-80 bg-gray-900/60 rounded-2xl animate-pulse border border-gray-800"></div>
-      <div class="h-80 bg-gray-900/60 rounded-2xl animate-pulse border border-gray-800"></div>
-      <div class="h-80 bg-gray-900/60 rounded-2xl animate-pulse border border-gray-800"></div>
-    </div>
+    <!-- Grid -->
+    <div id="showsGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-6"></div>
 
     <!-- Pagination -->
     <div id="paginationBar" class="mt-10 pt-6 border-t border-gray-800 flex items-center justify-between">
@@ -162,7 +213,7 @@
         onclick="changePage(-1)" 
         disabled
         class="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-gray-900 border border-gray-800 text-gray-400 disabled:opacity-40 disabled:cursor-not-allowed hover:text-white transition-all cursor-pointer">
-        <i class="fa-solid fa-chevron-left mr-1"></i> Previous
+        <i class="fa-solid fa-chevron-left mr-1"></i> <span data-i18n="btn_prev">Previous</span>
       </button>
 
       <span id="pageIndicator" class="text-xs sm:text-sm text-gray-400 font-medium">Page 1 of 1</span>
@@ -171,13 +222,14 @@
         id="nextPageBtn" 
         onclick="changePage(1)" 
         class="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-gray-900 border border-gray-800 text-gray-400 disabled:opacity-40 disabled:cursor-not-allowed hover:text-white transition-all cursor-pointer">
-        Next <i class="fa-solid fa-chevron-right ml-1"></i>
+        <span data-i18n="btn_next">Next</span> <i class="fa-solid fa-chevron-right ml-1"></i>
       </button>
     </div>
   </main>
 
+  <!-- FOOTER -->
   <footer class="border-t border-gray-800 bg-gray-950 py-6 text-center text-xs text-gray-500">
-    CineDex Full-Stack Application • FastAPI & PostgreSQL
+    CineDex Full-Stack Tracker • FastAPI & Neon PostgreSQL
   </footer>
 
   <!-- AUTH MODAL -->
@@ -187,33 +239,19 @@
         <i class="fa-solid fa-xmark text-lg"></i>
       </button>
 
-      <h3 class="text-xl font-bold text-white mb-1">Welcome to CineDex</h3>
-      <p class="text-xs text-gray-400 mb-6">Sign in to sync your watchlist</p>
+      <h3 class="text-xl font-bold text-white mb-1" data-i18n="auth_title">Welcome to CineDex</h3>
+      <p class="text-xs text-gray-400 mb-6" data-i18n="auth_desc">Sign in to sync your watchlist and statistics</p>
 
       <form id="authForm" onsubmit="handleAuthSubmit(event)" class="space-y-4">
         <div>
-          <label class="block text-xs font-semibold text-gray-300 mb-1">Username</label>
-          <input 
-            type="text" 
-            id="authUsername" 
-            required 
-            class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-amber-500"
-            placeholder="admin"
-          />
+          <label class="block text-xs font-semibold text-gray-300 mb-1" data-i18n="auth_user">Username</label>
+          <input type="text" id="authUsername" required class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-amber-500" placeholder="admin" />
         </div>
         <div>
-          <label class="block text-xs font-semibold text-gray-300 mb-1">Password</label>
-          <input 
-            type="password" 
-            id="authPassword" 
-            required 
-            class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-amber-500"
-            placeholder="••••••••"
-          />
+          <label class="block text-xs font-semibold text-gray-300 mb-1" data-i18n="auth_pass">Password</label>
+          <input type="password" id="authPassword" required class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-amber-500" placeholder="••••••••" />
         </div>
-        <button 
-          type="submit" 
-          class="w-full bg-amber-500 hover:bg-amber-400 text-black font-bold py-2.5 rounded-xl text-sm transition-all mt-2 cursor-pointer">
+        <button type="submit" class="w-full bg-amber-500 hover:bg-amber-400 text-black font-bold py-2.5 rounded-xl text-sm transition-all mt-2 cursor-pointer" data-i18n="btn_signin">
           Sign In
         </button>
       </form>
@@ -227,20 +265,124 @@
     let currentHeroIndex = 0;
     let heroInterval = null;
     let currentTab = 'all';
-    let userFavorites = JSON.parse(localStorage.getItem('cinedex_favorites') || '[]');
+    let currentLang = localStorage.getItem('cinedex_lang') || 'en';
     let currentPage = 1;
     const itemsPerPage = 8;
 
+    // داده‌های کاربر ذخیره شده در LocalStorage
+    let userLists = {
+      loved: JSON.parse(localStorage.getItem('cinedex_loved') || '[]'),
+      watchlist: JSON.parse(localStorage.getItem('cinedex_watchlist') || '[]'),
+      hated: JSON.parse(localStorage.getItem('cinedex_hated') || '[]')
+    };
+
+    // دیکشنری دو زبانه کامل
+    const translations = {
+      en: {
+        nav_discover: '<i class="fa-solid fa-compass mr-1"></i> Discover',
+        nav_watchlist: '<i class="fa-solid fa-bookmark mr-1 text-blue-400"></i> Watchlist',
+        nav_loved: '<i class="fa-solid fa-heart mr-1 text-rose-500"></i> Loved',
+        nav_hated: '<i class="fa-solid fa-thumbs-down mr-1 text-gray-400"></i> Hated',
+        btn_signin: 'Sign In',
+        time_watched_label: 'Total Screen Time:',
+        time_watched_sub: '(based on Loved shows)',
+        stat_loved: 'Loved',
+        stat_watchlist: 'Plan to Watch',
+        stat_hated: 'Hated',
+        spotlight_badge: 'Spotlight Pick',
+        btn_love_show: 'Mark as Loved',
+        btn_add_watchlist: 'Add to Watchlist',
+        tab_all: 'Discover',
+        tab_watchlist: 'Watchlist',
+        tab_loved: 'Loved',
+        tab_hated: 'Hated',
+        db_live_notice: 'Live FastAPI & Neon',
+        btn_prev: 'Previous',
+        btn_next: 'Next',
+        auth_title: 'Welcome to CineDex',
+        auth_desc: 'Sign in to sync your watchlist and statistics',
+        auth_user: 'Username',
+        auth_pass: 'Password',
+        no_shows: 'No shows found in this category.'
+      },
+      fa: {
+        nav_discover: '<i class="fa-solid fa-compass ml-1"></i> کاوش سریال‌ها',
+        nav_watchlist: '<i class="fa-solid fa-bookmark ml-1 text-blue-400"></i> در برنامه تماشا',
+        nav_loved: '<i class="fa-solid fa-heart ml-1 text-rose-500"></i> دوست‌داشتنی‌ها',
+        nav_hated: '<i class="fa-solid fa-thumbs-down ml-1 text-gray-400"></i> نپسندیده‌ام',
+        btn_signin: 'ورود به حساب',
+        time_watched_label: 'مجموع زمان تماشا:',
+        time_watched_sub: '(بر اساس سریال‌های دیده‌شده)',
+        stat_loved: 'علاقه‌مندی',
+        stat_watchlist: 'در برنامه تماشا',
+        stat_hated: 'نپسندیده',
+        spotlight_badge: 'پیشنهاد ویژه',
+        btn_love_show: 'افزودن به دیده‌شده‌ها',
+        btn_add_watchlist: 'افزودن به لیست تماشا',
+        tab_all: 'کاوش',
+        tab_watchlist: 'لیست تماشا',
+        tab_loved: 'دوست‌داشتنی‌ها',
+        tab_hated: 'نپسندیده‌ام',
+        db_live_notice: 'اتصال زنده FastAPI و Neon',
+        btn_prev: 'قبلی',
+        btn_next: 'بعدی',
+        auth_title: 'خوش آمدید به ساین‌دکس',
+        auth_desc: 'برای همگام‌سازی لیست و آمار حساب خود وارد شوید',
+        auth_user: 'نام کاربری',
+        auth_pass: 'رمز عبور',
+        no_shows: 'هیچ سریالی در این بخش یافت نشد.'
+      }
+    };
+
+    function toggleLanguage() {
+      currentLang = currentLang === 'en' ? 'fa' : 'en';
+      localStorage.setItem('cinedex_lang', currentLang);
+      applyLanguage();
+    }
+
+    function applyLanguage() {
+      const t = translations[currentLang];
+      document.documentElement.dir = currentLang === 'fa' ? 'rtl' : 'ltr';
+      document.documentElement.lang = currentLang;
+      document.getElementById('langLabel').innerText = currentLang === 'en' ? 'FA' : 'EN';
+
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (t[key]) el.innerHTML = t[key];
+      });
+
+      updateTabTitle();
+      applyFilters();
+    }
+
+    function resolvePoster(show) {
+      const title = (show.title || '').toLowerCase();
+      if (title.includes('original sin')) return "https://static.tvmaze.com/uploads/images/medium_portrait/542/1355486.jpg";
+      if (title.includes('dexter')) return "https://static.tvmaze.com/uploads/images/medium_portrait/173/433430.jpg";
+      if (title.includes('breaking bad')) return "https://static.tvmaze.com/uploads/images/medium_portrait/501/1253519.jpg";
+      if (title.includes('saul')) return "https://static.tvmaze.com/uploads/images/medium_portrait/413/1034988.jpg";
+      return show.poster_path || "https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=500&auto=format&fit=crop";
+    }
+
+    function resolveBackdrop(show) {
+      const title = (show.title || '').toLowerCase();
+      if (title.includes('original sin') || title.includes('dexter')) return "https://static.tvmaze.com/uploads/images/original_untouched/173/433430.jpg";
+      if (title.includes('breaking bad')) return "https://static.tvmaze.com/uploads/images/original_untouched/501/1253519.jpg";
+      if (title.includes('saul')) return "https://static.tvmaze.com/uploads/images/original_untouched/413/1034988.jpg";
+      return show.backdrop_path || resolvePoster(show);
+    }
+
+    // باز و بسته کردن مدال
     window.openAuthModal = function() {
-      const modal = document.getElementById("authModal");
-      modal.classList.remove("hidden");
-      modal.classList.add("flex");
+      const m = document.getElementById("authModal");
+      m.classList.remove("hidden");
+      m.classList.add("flex");
     };
 
     window.closeAuthModal = function() {
-      const modal = document.getElementById("authModal");
-      modal.classList.add("hidden");
-      modal.classList.remove("flex");
+      const m = document.getElementById("authModal");
+      m.classList.add("hidden");
+      m.classList.remove("flex");
     };
 
     document.getElementById("authModal").addEventListener("click", function(e) {
@@ -255,11 +397,69 @@
       closeAuthModal();
     };
 
+    // سیستم سه‌گانه لیست‌ها: Watchlist, Loved, Hated
+    window.toggleList = function(type, showId) {
+      const list = userLists[type];
+      const index = list.indexOf(showId);
+
+      if (index > -1) {
+        list.splice(index, 1);
+      } else {
+        // حذف از سایر لیست‌ها در صورت اضافه شدن به یکی از آنها
+        ['loved', 'watchlist', 'hated'].forEach(t => {
+          const i = userLists[t].indexOf(showId);
+          if (i > -1) userLists[t].splice(i, 1);
+        });
+        list.push(showId);
+      }
+
+      ['loved', 'watchlist', 'hated'].forEach(t => {
+        localStorage.setItem(`cinedex_${t}`, JSON.stringify(userLists[t]));
+      });
+
+      calculateWatchTime();
+      updateBadgeCounts();
+      updateHeroActionButtons();
+      applyFilters();
+    };
+
+    // محاسبه دقیق زمان تماشا (بر مبنای هر قسمت ۵۰ دقیقه برای سریال‌های Loved)
+    function calculateWatchTime() {
+      let totalMinutes = 0;
+      allShows.forEach(show => {
+        if (userLists.loved.includes(show.id)) {
+          const eps = show.total_episodes || (show.total_seasons ? show.total_seasons * 10 : 10);
+          totalMinutes += eps * 50;
+        }
+      });
+
+      const days = Math.floor(totalMinutes / (24 * 60));
+      const hours = Math.floor((totalMinutes % (24 * 60)) / 60);
+      const minutes = totalMinutes % 60;
+
+      let timeStr = "";
+      if (days > 0) timeStr += `${days}${currentLang === 'fa' ? ' روز ' : 'd '}`;
+      timeStr += `${hours}${currentLang === 'fa' ? ' ساعت ' : 'h '}`;
+      timeStr += `${minutes}${currentLang === 'fa' ? ' دقیقه' : 'm'}`;
+
+      document.getElementById("totalWatchTime").innerText = timeStr;
+    }
+
+    function updateBadgeCounts() {
+      document.getElementById("lovedCountBadge").innerText = userLists.loved.length;
+      document.getElementById("watchlistCountBadge").innerText = userLists.watchlist.length;
+      document.getElementById("hatedCountBadge").innerText = userLists.hated.length;
+
+      document.getElementById("tLovedCount").innerText = userLists.loved.length;
+      document.getElementById("tWatchCount").innerText = userLists.watchlist.length;
+      document.getElementById("tHatedCount").innerText = userLists.hated.length;
+    }
+
     window.setTab = function(tabName) {
       currentTab = tabName;
       currentPage = 1;
 
-      ['all', 'dexter', 'favorites'].forEach(t => {
+      ['all', 'watchlist', 'loved', 'hated'].forEach(t => {
         const btn = document.getElementById(`tab-${t}`);
         if (t === tabName) {
           btn.className = "px-4 py-2 rounded-xl text-sm font-bold bg-amber-500 text-black transition-all cursor-pointer";
@@ -268,47 +468,41 @@
         }
       });
 
-      const titleEl = document.getElementById("currentTabTitle");
-      if (tabName === 'all') titleEl.querySelector("span").innerText = "All Shows";
-      if (tabName === 'dexter') titleEl.querySelector("span").innerText = "Dexter Universe";
-      if (tabName === 'favorites') titleEl.querySelector("span").innerText = "Your Favorites";
-
+      updateTabTitle();
       applyFilters();
     };
 
-    window.toggleFavorite = function(showId) {
-      const index = userFavorites.indexOf(showId);
-      if (index > -1) {
-        userFavorites.splice(index, 1);
-      } else {
-        userFavorites.push(showId);
-      }
-      localStorage.setItem('cinedex_favorites', JSON.stringify(userFavorites));
-      updateFavCount();
-      updateHeroFavStatus();
-      applyFilters();
-    };
-
-    function updateFavCount() {
-      document.getElementById("favCount").innerText = userFavorites.length;
+    function updateTabTitle() {
+      const t = translations[currentLang];
+      const titleEl = document.getElementById("tabHeadingText");
+      if (currentTab === 'all') titleEl.innerText = currentLang === 'fa' ? 'کاوش همه‌جا' : 'Discover';
+      if (currentTab === 'watchlist') titleEl.innerText = t.tab_watchlist;
+      if (currentTab === 'loved') titleEl.innerText = t.tab_loved;
+      if (currentTab === 'hated') titleEl.innerText = t.tab_hated;
     }
 
-    window.toggleHeroFavorite = function() {
+    // Hero Spotlight & Carousel
+    window.toggleHeroList = function(type) {
       if (!spotlightShows[currentHeroIndex]) return;
-      toggleFavorite(spotlightShows[currentHeroIndex].id);
+      toggleList(type, spotlightShows[currentHeroIndex].id);
     };
 
-    function updateHeroFavStatus() {
+    function updateHeroActionButtons() {
       if (!spotlightShows[currentHeroIndex]) return;
-      const isFav = userFavorites.includes(spotlightShows[currentHeroIndex].id);
+      const showId = spotlightShows[currentHeroIndex].id;
+
+      const isLoved = userLists.loved.includes(showId);
+      const isWatch = userLists.watchlist.includes(showId);
+
       const heart = document.getElementById("heroHeart");
-      heart.className = isFav ? "fa-solid fa-heart text-red-500" : "fa-solid fa-heart";
+      heart.className = isLoved ? "fa-solid fa-heart text-red-600" : "fa-solid fa-heart";
+
+      const bookmark = document.getElementById("heroBookmark");
+      bookmark.className = isWatch ? "fa-solid fa-bookmark text-blue-400" : "fa-solid fa-bookmark";
     }
 
     async function fetchShows() {
       const statusBadge = document.getElementById("backendStatus");
-      const grid = document.getElementById("showsGrid");
-
       try {
         const response = await fetch(`${API_BASE}/shows`);
         if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
@@ -319,31 +513,22 @@
         statusBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500"></span> Neon DB Connected`;
         
         spotlightShows = allShows.slice(0, 5);
-        if (spotlightShows.length > 0) {
-          setupHeroCarousel();
-        }
+        if (spotlightShows.length > 0) setupHeroCarousel();
 
-        updateFavCount();
-        applyFilters();
+        calculateWatchTime();
+        updateBadgeCounts();
+        applyLanguage();
       } catch (err) {
-        console.error("API Fetch Error:", err);
+        console.error("API Error:", err);
+        statusBadge.className = "flex items-center gap-2 text-xs px-3 py-1.5 rounded-full bg-gray-900 border border-gray-800 text-red-400";
         statusBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-red-500"></span> Backend Offline`;
-        grid.innerHTML = `
-          <div class="col-span-full py-12 text-center text-gray-500">
-            <i class="fa-solid fa-circle-exclamation text-3xl text-amber-500/50 mb-3"></i>
-            <p class="text-sm">Could not fetch shows from API.</p>
-            <button onclick="fetchShows()" class="mt-4 px-4 py-1.5 bg-gray-800 text-gray-300 hover:text-white rounded-lg text-xs cursor-pointer">Retry</button>
-          </div>
-        `;
       }
     }
 
     function setupHeroCarousel() {
       renderHeroSlide(currentHeroIndex);
       if (heroInterval) clearInterval(heroInterval);
-      heroInterval = setInterval(() => {
-        nextHeroSlide();
-      }, 5000);
+      heroInterval = setInterval(() => nextHeroSlide(), 6000);
     }
 
     function renderHeroSlide(index) {
@@ -351,25 +536,19 @@
       if (!show) return;
 
       const heroSec = document.getElementById("heroSection");
-      const imgUrl = show.backdrop_path || show.poster_path || '';
-      if (imgUrl) {
-        heroSec.style.backgroundImage = `url('${imgUrl}')`;
-      }
+      heroSec.style.backgroundImage = `url('${resolveBackdrop(show)}')`;
 
-      document.getElementById("heroTitle").innerText = show.title || "Unknown";
-      document.getElementById("heroRating").innerHTML = `<i class="fa-solid fa-star"></i> ${show.vote_average || 'N/A'}`;
-      document.getElementById("heroYear").innerText = show.first_air_date ? show.first_air_date.split('-')[0] : 'Series';
-      document.getElementById("heroSeasons").innerText = `${show.total_seasons || 1} Seasons`;
+      document.getElementById("heroTitle").innerText = show.title || "Dexter";
+      document.getElementById("heroRating").innerHTML = `<i class="fa-solid fa-star"></i> ${show.vote_average || '8.7'}`;
+      document.getElementById("heroYear").innerText = show.first_air_date ? show.first_air_date.split('-')[0] : '2006';
+      document.getElementById("heroSeasons").innerText = `${show.total_seasons || 8} Seasons`;
       document.getElementById("heroOverview").innerText = show.overview || "";
 
       const poster = document.getElementById("heroPoster");
-      poster.src = show.poster_path || imgUrl;
-      poster.onerror = function() {
-        this.src = 'https://via.placeholder.com/300x450?text=CineDex';
-      };
+      poster.src = resolvePoster(show);
 
       document.getElementById("heroSlideIndicator").innerText = `${index + 1} / ${spotlightShows.length}`;
-      updateHeroFavStatus();
+      updateHeroActionButtons();
     }
 
     window.nextHeroSlide = function() {
@@ -387,10 +566,12 @@
     function applyFilters() {
       let filtered = [...allShows];
 
-      if (currentTab === 'dexter') {
-        filtered = filtered.filter(s => (s.title && s.title.toLowerCase().includes('dexter')) || (s.overview && s.overview.toLowerCase().includes('dexter')));
-      } else if (currentTab === 'favorites') {
-        filtered = filtered.filter(s => userFavorites.includes(s.id));
+      if (currentTab === 'watchlist') {
+        filtered = filtered.filter(s => userLists.watchlist.includes(s.id));
+      } else if (currentTab === 'loved') {
+        filtered = filtered.filter(s => userLists.loved.includes(s.id));
+      } else if (currentTab === 'hated') {
+        filtered = filtered.filter(s => userLists.hated.includes(s.id));
       }
 
       const q = document.getElementById("searchInput").value.toLowerCase().trim();
@@ -425,34 +606,53 @@
     function renderCards(shows) {
       const grid = document.getElementById("showsGrid");
       if (!shows || shows.length === 0) {
-        grid.innerHTML = `<div class="col-span-full text-center py-12 text-gray-500 text-sm">No shows found.</div>`;
+        grid.innerHTML = `<div class="col-span-full text-center py-12 text-gray-500 text-sm">${translations[currentLang].no_shows}</div>`;
         return;
       }
 
       grid.innerHTML = shows.map(show => {
-        const isFav = userFavorites.includes(show.id);
-        const posterUrl = show.poster_path || 'https://via.placeholder.com/300x450?text=CineDex';
+        const isLoved = userLists.loved.includes(show.id);
+        const isWatch = userLists.watchlist.includes(show.id);
+        const isHated = userLists.hated.includes(show.id);
 
         return `
           <div class="group bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden hover:border-amber-500/50 transition-all flex flex-col justify-between hover:shadow-xl hover:shadow-black">
             <div class="relative overflow-hidden aspect-[2/3] bg-gray-950">
               <img 
-                src="${posterUrl}" 
+                src="${resolvePoster(show)}" 
                 alt="${show.title}" 
                 loading="lazy"
                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                onerror="this.src='https://via.placeholder.com/300x450?text=CineDex'"
               />
               <div class="absolute top-2 right-2 bg-black/80 backdrop-blur-md px-2 py-0.5 rounded-md text-xs font-bold text-amber-400 flex items-center gap-1 border border-amber-500/20">
                 <i class="fa-solid fa-star text-[10px]"></i> ${show.vote_average || 'N/A'}
               </div>
-              <button 
-                onclick="toggleFavorite(${show.id})"
-                class="absolute top-2 left-2 w-8 h-8 rounded-full bg-black/70 backdrop-blur-md flex items-center justify-center text-xs transition-colors hover:scale-110 cursor-pointer ${isFav ? 'text-red-500' : 'text-gray-300'}">
-                <i class="fa-solid fa-heart"></i>
-              </button>
+              
+              <!-- اکشن‌بار سریع روی هر کارت -->
+              <div class="absolute top-2 left-2 flex items-center gap-1">
+                <button 
+                  title="Loved"
+                  onclick="toggleList('loved', ${show.id})"
+                  class="w-7 h-7 rounded-full bg-black/75 backdrop-blur-md flex items-center justify-center text-xs transition-transform hover:scale-110 cursor-pointer ${isLoved ? 'text-rose-500 font-bold' : 'text-gray-400 hover:text-white'}">
+                  <i class="fa-solid fa-heart"></i>
+                </button>
+                <button 
+                  title="Watchlist"
+                  onclick="toggleList('watchlist', ${show.id})"
+                  class="w-7 h-7 rounded-full bg-black/75 backdrop-blur-md flex items-center justify-center text-xs transition-transform hover:scale-110 cursor-pointer ${isWatch ? 'text-blue-400 font-bold' : 'text-gray-400 hover:text-white'}">
+                  <i class="fa-solid fa-bookmark"></i>
+                </button>
+                <button 
+                  title="Hate"
+                  onclick="toggleList('hated', ${show.id})"
+                  class="w-7 h-7 rounded-full bg-black/75 backdrop-blur-md flex items-center justify-center text-xs transition-transform hover:scale-110 cursor-pointer ${isHated ? 'text-amber-500 font-bold' : 'text-gray-400 hover:text-white'}">
+                  <i class="fa-solid fa-thumbs-down"></i>
+                </button>
+              </div>
+
               ${show.total_seasons ? `<div class="absolute bottom-2 left-2 bg-black/70 backdrop-blur-sm px-2 py-0.5 rounded text-[10px] text-gray-300 border border-gray-700">${show.total_seasons} Seasons</div>` : ''}
             </div>
+            
             <div class="p-4 flex-1 flex flex-col justify-between gap-3">
               <div>
                 <h3 class="font-bold text-white text-base group-hover:text-amber-400 transition-colors line-clamp-1">${show.title}</h3>
