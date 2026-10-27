@@ -1,7 +1,11 @@
 # 🎬 CineDex — Full-Stack TV Show Discovery & Watch Tracker
 
 <p align="center">
-  <img src="https://static.tvmaze.com/uploads/images/original_untouched/173/433430.jpg" alt="CineDex Hero Banner" width="100%" style="border-radius: 12px; max-height: 400px; object-fit: cover;" />
+  <img src="https://images6.alphacoders.com/648/648834.jpg" alt="Dexter Morgan Banner" width="100%" style="border-radius: 12px; max-height: 420px; object-fit: cover;" />
+</p>
+
+<p align="center">
+  A high-performance, cloud-native TV show tracking and discovery platform built with modern architectural patterns.
 </p>
 
 <p align="center">
