@@ -3,27 +3,40 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CineDex - Discover & Track TV Shows</title>
+  <title>CineDex - Discover, Mood Picks & Track Series</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     body {
-      background-color: #0b0f19;
+      background-color: #07090e;
       color: #f3f4f6;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    }
-    .hero-bg {
-      min-height: 420px;
-      background-size: cover;
-      background-position: center 25%;
-      transition: background-image 0.6s ease-in-out;
-    }
-    .hero-grad {
-      background: linear-gradient(90deg, rgba(11,15,25,0.96) 0%, rgba(11,15,25,0.85) 45%, rgba(11,15,25,0.4) 100%),
-                  linear-gradient(180deg, rgba(11,15,25,0.2) 0%, rgba(11,15,25,1) 100%);
+      overflow-x: hidden;
     }
     .poster-glow {
-      box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.9), 0 0 25px rgba(245, 158, 11, 0.2);
+      box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.9), 0 0 25px rgba(245, 158, 11, 0.25);
+    }
+    .hero-grad {
+      background: linear-gradient(90deg, rgba(7,9,14,0.98) 0%, rgba(7,9,14,0.85) 45%, rgba(7,9,14,0.3) 100%),
+                  linear-gradient(180deg, rgba(7,9,14,0.1) 0%, rgba(7,9,14,1) 100%);
+    }
+    /* Genre Solar System Animations */
+    .orbit-ring {
+      border: 1px dashed rgba(255, 255, 255, 0.12);
+      border-radius: 50%;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+    .planet {
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+      cursor: pointer;
+    }
+    .planet:hover {
+      transform: scale(1.22);
+      z-index: 30;
     }
     .fade-anim {
       animation: fadeIn 0.4s ease-in-out;
@@ -37,53 +50,79 @@
 <body class="min-h-screen flex flex-col justify-between selection:bg-amber-500 selection:text-black">
 
   <!-- NAVBAR -->
-  <header class="border-b border-gray-800/80 sticky top-0 z-40 bg-[#0b0f19]/90 backdrop-blur-md">
+  <header class="border-b border-gray-800/80 sticky top-0 z-50 bg-[#07090e]/95 backdrop-blur-md">
     <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
-      <div class="flex items-center gap-6">
-        <a href="#" onclick="location.reload()" class="flex items-center gap-2 text-2xl font-black text-white">
-          <span class="w-8 h-8 rounded-lg bg-amber-500 flex items-center justify-center text-black font-black text-lg">C</span>
-          Cine<span class="text-amber-400">Dex</span>
+      
+      <!-- Logo -->
+      <div class="flex items-center gap-8">
+        <a href="#" onclick="location.reload()" class="flex items-center gap-3 text-2xl font-black text-white group">
+          <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-amber-600 to-amber-400 p-[2px] shadow-lg shadow-amber-500/20">
+            <div class="w-full h-full bg-[#07090e] rounded-full flex items-center justify-center">
+              <i class="fa-solid fa-play text-amber-400 text-xs ml-0.5 group-hover:scale-110 transition-transform"></i>
+            </div>
+          </div>
+          <span>Cine<span class="text-amber-400">Dex</span></span>
         </a>
-        <nav class="hidden md:flex items-center gap-5 text-sm font-medium text-gray-400">
-          <button onclick="setTab('all')" class="hover:text-amber-400 transition-colors cursor-pointer" data-i18n="nav_discover">
-            <i class="fa-solid fa-compass mr-1"></i> Discover
+
+        <!-- Main Navigation Links -->
+        <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-gray-300">
+          <button onclick="setTab('all')" class="hover:text-amber-400 transition-colors cursor-pointer flex items-center gap-2">
+            <i class="fa-solid fa-play text-xs text-amber-400"></i> <span data-i18n="nav_series">Series</span>
           </button>
-          <button onclick="setTab('watchlist')" class="hover:text-amber-400 transition-colors cursor-pointer" data-i18n="nav_watchlist">
-            <i class="fa-solid fa-bookmark mr-1 text-blue-400"></i> Watchlist
-          </button>
-          <button onclick="setTab('loved')" class="hover:text-amber-400 transition-colors cursor-pointer" data-i18n="nav_loved">
-            <i class="fa-solid fa-heart mr-1 text-rose-500"></i> Loved
-          </button>
-          <button onclick="setTab('hated')" class="hover:text-amber-400 transition-colors cursor-pointer" data-i18n="nav_hated">
-            <i class="fa-solid fa-thumbs-down mr-1 text-gray-400"></i> Hated
-          </button>
+          <a href="#moodSection" class="hover:text-amber-400 transition-colors flex items-center gap-2">
+            <i class="fa-solid fa-wand-magic-sparkles text-xs text-amber-400"></i> <span data-i18n="nav_moods">Moods</span>
+          </a>
+          <a href="#universeSection" class="hover:text-amber-400 transition-colors flex items-center gap-2">
+            <i class="fa-solid fa-atom text-xs text-amber-400"></i> <span data-i18n="nav_universe">Universe</span>
+          </a>
         </nav>
       </div>
 
+      <!-- Right Action Items -->
       <div class="flex items-center gap-3">
-        <!-- Language Switcher -->
-        <button 
-          onclick="toggleLanguage()" 
-          class="bg-gray-800 hover:bg-gray-700 text-xs font-bold px-3 py-1.5 rounded-lg border border-gray-700 text-gray-300 transition-all flex items-center gap-1.5 cursor-pointer">
-          <i class="fa-solid fa-globe text-amber-400"></i>
-          <span id="langLabel">FA</span>
-        </button>
+        
+        <!-- Custom Language Dropdown -->
+        <div class="relative">
+          <button 
+            id="langMenuBtn"
+            onclick="toggleLangMenu()" 
+            class="bg-gray-900/90 hover:bg-gray-800 border border-amber-500/30 rounded-xl px-3 py-1.5 text-xs font-bold text-gray-200 flex items-center gap-2 transition-all cursor-pointer">
+            <span id="currentLangFlag">🇬🇧</span>
+            <span id="currentLangText">English</span>
+            <i class="fa-solid fa-chevron-down text-[10px] text-gray-400 ml-1 transition-transform" id="langChevron"></i>
+          </button>
 
-        <div class="relative hidden sm:block w-56">
+          <!-- Dropdown Options -->
+          <div id="langDropdown" class="hidden absolute right-0 mt-2 w-40 bg-gray-900/95 backdrop-blur-xl border border-gray-800 rounded-2xl p-1.5 shadow-2xl z-50">
+            <div class="text-[10px] font-bold text-gray-500 px-3 py-1 uppercase tracking-wider">Language</div>
+            <button onclick="selectLanguage('en')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs hover:bg-gray-800/80 text-gray-200 font-semibold cursor-pointer">
+              <span class="flex items-center gap-2">🇬🇧 English</span>
+              <i class="fa-solid fa-check text-amber-400 text-xs" id="checkEn"></i>
+            </button>
+            <button onclick="selectLanguage('fa')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs hover:bg-gray-800/80 text-gray-200 font-semibold cursor-pointer">
+              <span class="flex items-center gap-2">🇮🇷 فارسی</span>
+              <i class="fa-solid fa-check text-amber-400 text-xs hidden" id="checkFa"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="relative hidden sm:block w-52">
           <input 
             type="text" 
             id="searchInput"
-            placeholder="Search series..." 
-            class="w-full bg-gray-900 border border-gray-700 rounded-full py-1.5 pl-9 pr-4 text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-amber-500"
+            placeholder="Search shows..." 
+            class="w-full bg-gray-900 border border-gray-800 rounded-full py-1.5 pl-8 pr-3 text-xs text-gray-200 placeholder-gray-500 focus:outline-none focus:border-amber-500"
             oninput="handleSearch(this.value)"
           />
-          <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-xs text-gray-500"></i>
+          <i class="fa-solid fa-magnifying-glass absolute left-3 top-2 text-[10px] text-gray-500"></i>
         </div>
 
+        <!-- Sign In Button -->
         <button 
           id="authBtn"
           onclick="openAuthModal()" 
-          class="bg-amber-500 hover:bg-amber-400 text-black text-sm font-bold px-4 py-2 rounded-full transition-all shadow-md shadow-amber-500/20 flex items-center gap-2 cursor-pointer">
+          class="bg-amber-500 hover:bg-amber-400 text-black text-xs font-bold px-4 py-2 rounded-full transition-all shadow-md shadow-amber-500/20 flex items-center gap-1.5 cursor-pointer">
           <i class="fa-solid fa-user"></i>
           <span data-i18n="btn_signin">Sign In</span>
         </button>
@@ -91,72 +130,74 @@
     </div>
   </header>
 
-  <!-- WATCH TIME STATS BANNER -->
-  <div class="bg-gray-900/60 border-b border-gray-800/80 px-4 py-3">
-    <div class="max-w-7xl mx-auto flex items-center justify-between flex-wrap gap-4 text-xs sm:text-sm">
-      <div class="flex items-center gap-3">
-        <span class="w-8 h-8 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
-          <i class="fa-solid fa-stopwatch"></i>
+  <!-- SCREEN TIME STATS BAR -->
+  <div class="bg-gray-950/80 border-b border-gray-800/80 px-4 py-2.5">
+    <div class="max-w-7xl mx-auto flex items-center justify-between flex-wrap gap-4 text-xs">
+      <div class="flex items-center gap-2.5">
+        <span class="w-7 h-7 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
+          <i class="fa-solid fa-clock text-xs"></i>
         </span>
         <div>
           <span class="text-gray-400" data-i18n="time_watched_label">Total Screen Time:</span>
           <span id="totalWatchTime" class="font-bold text-amber-400 ml-1">0h 0m</span>
-          <span class="text-gray-500 text-xs ml-1" data-i18n="time_watched_sub">(based on Loved shows)</span>
         </div>
       </div>
-      <div class="flex items-center gap-4 text-xs text-gray-400">
+      <div class="flex items-center gap-4 text-gray-400">
         <div><i class="fa-solid fa-heart text-rose-500 mr-1"></i> <span id="lovedCountBadge">0</span> <span data-i18n="stat_loved">Loved</span></div>
-        <div><i class="fa-solid fa-bookmark text-blue-400 mr-1"></i> <span id="watchlistCountBadge">0</span> <span data-i18n="stat_watchlist">Plan to Watch</span></div>
+        <div><i class="fa-solid fa-bookmark text-blue-400 mr-1"></i> <span id="watchlistCountBadge">0</span> <span data-i18n="stat_watchlist">Watchlist</span></div>
         <div><i class="fa-solid fa-thumbs-down text-gray-500 mr-1"></i> <span id="hatedCountBadge">0</span> <span data-i18n="stat_hated">Hated</span></div>
       </div>
     </div>
   </div>
 
-  <!-- HERO DYNAMIC SPOTLIGHT -->
-  <section id="heroSection" class="hero-bg border-b border-gray-800/80 relative" style="background-image: url('https://static.tvmaze.com/uploads/images/original_untouched/173/433430.jpg');">
+  <!-- HERO DYNAMIC SPOTLIGHT CAROUSEL -->
+  <section id="heroSection" class="relative min-h-[460px] bg-cover bg-center border-b border-gray-800/80 flex items-center transition-all duration-700" style="background-image: url('https://media.wired.com/photos/5926a8cef3e2356fd800a08d/3:2/w_2560%2Cc_limit/Dexter.jpg');">
     <div class="hero-grad w-full h-full py-12 px-4 flex items-center">
       <div class="max-w-7xl mx-auto w-full flex flex-col md:flex-row items-center justify-between gap-8">
         
         <div class="flex-1 space-y-4 fade-anim" id="heroTextContainer">
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-semibold uppercase">
-            <i class="fa-solid fa-fire text-[10px]"></i> <span data-i18n="spotlight_badge">Spotlight Pick</span>
-          </div>
-          <h1 id="heroTitle" class="text-4xl sm:text-6xl font-black text-white drop-shadow-md">Dexter</h1>
+          <h1 id="heroTitle" class="text-4xl sm:text-6xl font-black text-white tracking-tight drop-shadow-xl uppercase">DEXTER</h1>
           
           <div class="flex items-center gap-3 text-xs sm:text-sm text-gray-300 font-medium flex-wrap">
-            <span id="heroRating" class="text-amber-400 font-bold bg-black/60 px-2 py-0.5 rounded border border-amber-500/30">
-              <i class="fa-solid fa-star"></i> 8.7
+            <span id="heroRating" class="text-black bg-amber-400 font-black px-2 py-0.5 rounded flex items-center gap-1">
+              <i class="fa-solid fa-star text-[10px]"></i> 8.7 IMDb
             </span>
+            <span>•</span>
+            <span id="heroType" class="px-2 py-0.5 rounded bg-gray-800 text-gray-300">TV Series</span>
             <span>•</span>
             <span id="heroYear">2006</span>
             <span>•</span>
-            <span id="heroSeasons" class="px-2 py-0.5 rounded bg-gray-800 text-gray-300">8 Seasons</span>
+            <span id="heroSeasons" class="text-gray-400">8 Seasons (96 Eps)</span>
           </div>
 
-          <p id="heroOverview" class="text-gray-300 text-sm sm:text-base leading-relaxed max-w-2xl line-clamp-3">
+          <p id="heroOverview" class="text-gray-300 text-xs sm:text-sm leading-relaxed max-w-2xl line-clamp-3">
             Dexter Morgan leads a double life as a forensic analyst and a vigilante serial killer who targets murderers who have slipped through the justice system.
           </p>
 
-          <div class="flex items-center gap-3 pt-3 flex-wrap">
-            <button onclick="toggleHeroList('loved')" class="bg-amber-500 hover:bg-amber-400 text-black px-5 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center gap-2 cursor-pointer shadow-lg shadow-amber-500/20">
-              <i class="fa-solid fa-heart" id="heroHeart"></i> <span data-i18n="btn_love_show">Mark as Loved</span>
-            </button>
-            <button onclick="toggleHeroList('watchlist')" class="bg-gray-900 hover:bg-gray-800 text-white border border-gray-700 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all flex items-center gap-2 cursor-pointer">
+          <div class="flex items-center gap-3 pt-4 flex-wrap">
+            <button onclick="toggleHeroList('watchlist')" class="bg-amber-500 hover:bg-amber-400 text-black px-6 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all flex items-center gap-2 cursor-pointer shadow-lg shadow-amber-500/20">
               <i class="fa-solid fa-bookmark" id="heroBookmark"></i> <span data-i18n="btn_add_watchlist">Add to Watchlist</span>
             </button>
-            <div class="flex items-center gap-2 ml-2">
-              <button onclick="prevHeroSlide()" class="w-10 h-10 rounded-xl bg-gray-900 border border-gray-700 text-gray-300 hover:text-white flex items-center justify-center cursor-pointer">
+            <button onclick="toggleHeroList('loved')" class="bg-gray-900/90 hover:bg-gray-800 border border-gray-700 text-white px-5 py-2.5 rounded-xl font-semibold text-xs sm:text-sm transition-all flex items-center gap-2 cursor-pointer">
+              <i class="fa-solid fa-heart text-rose-500" id="heroHeart"></i> <span data-i18n="btn_love_show">Mark as Loved</span>
+            </button>
+            
+            <!-- Prev & Next -->
+            <div class="flex items-center gap-2 ml-4">
+              <button onclick="prevHeroSlide()" class="w-9 h-9 rounded-xl bg-gray-900/90 border border-gray-800 text-gray-300 hover:text-white flex items-center justify-center cursor-pointer">
                 <i class="fa-solid fa-chevron-left text-xs"></i>
               </button>
-              <button onclick="nextHeroSlide()" class="w-10 h-10 rounded-xl bg-gray-900 border border-gray-700 text-gray-300 hover:text-white flex items-center justify-center cursor-pointer">
+              <button onclick="nextHeroSlide()" class="w-9 h-9 rounded-xl bg-gray-900/90 border border-gray-800 text-gray-300 hover:text-white flex items-center justify-center cursor-pointer">
                 <i class="fa-solid fa-chevron-right text-xs"></i>
               </button>
             </div>
-            <span id="heroSlideIndicator" class="text-xs text-gray-400 font-mono ml-1">1 / 3</span>
           </div>
+
+          <!-- Carousel Dots -->
+          <div class="flex items-center gap-2 pt-3" id="heroDotsContainer"></div>
         </div>
 
-        <div class="w-44 sm:w-60 shrink-0 fade-anim" id="heroPosterContainer">
+        <div class="w-40 sm:w-56 shrink-0 fade-anim" id="heroPosterContainer">
           <img 
             id="heroPoster"
             src="https://static.tvmaze.com/uploads/images/medium_portrait/173/433430.jpg" 
@@ -169,22 +210,186 @@
     </div>
   </section>
 
+  <!-- EDITORIAL SECTIONS (CINEDEX ORIGINALS) -->
+  <section class="max-w-7xl mx-auto px-4 py-12 w-full">
+    <div class="bg-gradient-to-b from-gray-900/60 to-gray-950/80 border border-gray-800/80 rounded-3xl p-6 sm:p-8">
+      <div class="flex items-center gap-3 mb-2">
+        <span class="w-7 h-7 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
+          <i class="fa-solid fa-bolt text-xs"></i>
+        </span>
+        <span class="text-xs font-bold tracking-widest text-amber-400 uppercase">CineDex Curations</span>
+      </div>
+      <h2 class="text-2xl sm:text-3xl font-black text-white mb-2" data-i18n="curation_title">More than just watching</h2>
+      <p class="text-xs sm:text-sm text-gray-400 max-w-2xl mb-8" data-i18n="curation_desc">
+        Discover editorial collections, community picks, hidden gems, and curated watch guides designed to make choosing your next series effortless.
+      </p>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-gray-900/50 border border-gray-800/80 hover:border-amber-500/40 rounded-2xl p-5 transition-all">
+          <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 mb-4">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+          </div>
+          <h3 class="font-bold text-white text-base mb-1">CineDex Hidden Gems</h3>
+          <p class="text-xs text-gray-400">Curated shows and mini-series you probably missed across mainstream networks.</p>
+        </div>
+
+        <div class="bg-gray-900/50 border border-gray-800/80 hover:border-amber-500/40 rounded-2xl p-5 transition-all">
+          <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 mb-4">
+            <i class="fa-solid fa-clapperboard"></i>
+          </div>
+          <h3 class="font-bold text-white text-base mb-1">Weekend Binge Guide</h3>
+          <p class="text-xs text-gray-400">Hand-picked lists calibrated for an intense, zero-filler weekend marathon.</p>
+        </div>
+
+        <div class="bg-gray-900/50 border border-gray-800/80 hover:border-amber-500/40 rounded-2xl p-5 transition-all">
+          <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 mb-4">
+            <i class="fa-solid fa-users"></i>
+          </div>
+          <h3 class="font-bold text-white text-base mb-1">Critic-Free Picks</h3>
+          <p class="text-xs text-gray-400">Pure viewer ratings and raw community feedback without editorial bias.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- INTERACTIVE GENRE SOLAR SYSTEM (THE ORBIT) -->
+  <section id="universeSection" class="border-y border-gray-800/60 py-16 bg-[#06080c] relative overflow-hidden">
+    <div class="max-w-7xl mx-auto px-4 text-center mb-10 relative z-10">
+      <div class="text-xs font-bold tracking-widest text-amber-400 uppercase mb-2">Universe Navigation</div>
+      <h2 class="text-3xl sm:text-4xl font-black text-white" data-i18n="universe_title">Explore Genre Constellations</h2>
+      <p class="text-xs sm:text-sm text-gray-400 mt-2" data-i18n="universe_desc">Click any planet in the orbit to instantly filter series matching that universe.</p>
+    </div>
+
+    <!-- Orbit Display Container -->
+    <div class="relative w-full max-w-2xl h-[380px] sm:h-[460px] mx-auto flex items-center justify-center">
+      <div class="orbit-ring w-[220px] h-[220px]"></div>
+      <div class="orbit-ring w-[340px] h-[340px]"></div>
+      <div class="orbit-ring w-[440px] h-[440px]"></div>
+
+      <!-- Sun (Center) -->
+      <div onclick="filterByGenre('')" class="relative z-20 w-24 h-24 rounded-full bg-gradient-to-tr from-amber-600 via-yellow-500 to-amber-300 shadow-[0_0_50px_rgba(245,158,11,0.6)] flex flex-col items-center justify-center cursor-pointer transition-transform hover:scale-110">
+        <i class="fa-solid fa-sparkles text-black text-sm mb-1"></i>
+        <span class="text-[10px] font-black text-black tracking-widest uppercase">CINEDEX</span>
+        <span class="text-[8px] font-bold text-black/70">ALL SHOWS</span>
+      </div>
+
+      <!-- Planet: Crime -->
+      <div onclick="filterByGenre('Crime')" class="planet absolute z-20 flex flex-col items-center" style="top: 28%; left: 32%;">
+        <div class="w-11 h-11 rounded-full bg-slate-500 shadow-[0_0_15px_rgba(148,163,184,0.6)] border border-slate-300"></div>
+        <span class="text-[11px] font-bold text-gray-200 mt-1.5">Crime</span>
+      </div>
+
+      <!-- Planet: Action -->
+      <div onclick="filterByGenre('Action')" class="planet absolute z-20 flex flex-col items-center" style="top: 25%; left: 14%;">
+        <div class="w-12 h-12 rounded-full bg-rose-600 shadow-[0_0_20px_rgba(225,29,72,0.7)] border border-rose-400"></div>
+        <span class="text-[11px] font-bold text-gray-200 mt-1.5">Action</span>
+      </div>
+
+      <!-- Planet: Drama -->
+      <div onclick="filterByGenre('Drama')" class="planet absolute z-20 flex flex-col items-center" style="bottom: 18%; left: 24%;">
+        <div class="w-14 h-14 rounded-full bg-purple-600 shadow-[0_0_25px_rgba(147,51,234,0.7)] border border-purple-400"></div>
+        <span class="text-[11px] font-bold text-gray-200 mt-1.5">Drama</span>
+      </div>
+
+      <!-- Planet: Thriller -->
+      <div onclick="filterByGenre('Thriller')" class="planet absolute z-20 flex flex-col items-center" style="bottom: 10%; right: 38%;">
+        <div class="w-10 h-10 rounded-full bg-orange-600 shadow-[0_0_15px_rgba(234,88,12,0.6)] border border-orange-400"></div>
+        <span class="text-[11px] font-bold text-gray-200 mt-1.5">Thriller</span>
+      </div>
+
+      <!-- Planet: Comedy -->
+      <div onclick="filterByGenre('Comedy')" class="planet absolute z-20 flex flex-col items-center" style="top: 12%; right: 46%;">
+        <div class="w-11 h-11 rounded-full bg-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.6)] border border-yellow-200"></div>
+        <span class="text-[11px] font-bold text-gray-200 mt-1.5">Comedy</span>
+      </div>
+
+      <!-- Planet: Horror -->
+      <div onclick="filterByGenre('Horror')" class="planet absolute z-20 flex flex-col items-center" style="top: 26%; right: 20%;">
+        <div class="w-11 h-11 rounded-full bg-emerald-600 shadow-[0_0_15px_rgba(5,150,105,0.6)] border border-emerald-400"></div>
+        <span class="text-[11px] font-bold text-gray-200 mt-1.5">Horror</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHAT'S YOUR MOOD SECTION -->
+  <section id="moodSection" class="max-w-7xl mx-auto px-4 py-16 w-full">
+    <div class="mb-8">
+      <div class="text-xs font-bold tracking-widest text-amber-400 uppercase mb-2 flex items-center gap-2">
+        <i class="fa-solid fa-wand-magic-sparkles text-xs"></i> <span>Discovery by Emotion</span>
+      </div>
+      <h2 class="text-3xl font-black text-white" data-i18n="mood_title">What's your mood?</h2>
+      <p class="text-xs sm:text-sm text-gray-400 mt-1" data-i18n="mood_desc">Choose a vibe and CineDex instantly reshapes the catalog around your feeling.</p>
+    </div>
+
+    <!-- Mood Buttons Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      
+      <div onclick="filterByMood('mind')" class="bg-gray-900/60 hover:bg-gray-800/90 border border-gray-800 hover:border-amber-500/50 p-4 rounded-2xl flex items-center gap-4 cursor-pointer transition-all">
+        <div class="text-3xl">🤯</div>
+        <div>
+          <h4 class="font-bold text-white text-sm">Blow my mind</h4>
+          <p class="text-xs text-gray-400">Complex, smart, and unforgettable masterpieces</p>
+        </div>
+      </div>
+
+      <div onclick="filterByMood('adrenaline')" class="bg-gray-900/60 hover:bg-gray-800/90 border border-gray-800 hover:border-amber-500/50 p-4 rounded-2xl flex items-center gap-4 cursor-pointer transition-all">
+        <div class="text-3xl">💥</div>
+        <div>
+          <h4 class="font-bold text-white text-sm">Adrenaline</h4>
+          <p class="text-xs text-gray-400">Action, crime, and non-stop pressure</p>
+        </div>
+      </div>
+
+      <div onclick="filterByMood('scare')" class="bg-gray-900/60 hover:bg-gray-800/90 border border-gray-800 hover:border-amber-500/50 p-4 rounded-2xl flex items-center gap-4 cursor-pointer transition-all">
+        <div class="text-3xl">😨</div>
+        <div>
+          <h4 class="font-bold text-white text-sm">Scare me</h4>
+          <p class="text-xs text-gray-400">Psychological and intense dark tension</p>
+        </div>
+      </div>
+
+      <div onclick="filterByMood('laugh')" class="bg-gray-900/60 hover:bg-gray-800/90 border border-gray-800 hover:border-amber-500/50 p-4 rounded-2xl flex items-center gap-4 cursor-pointer transition-all">
+        <div class="text-3xl">😂</div>
+        <div>
+          <h4 class="font-bold text-white text-sm">Make me laugh</h4>
+          <p class="text-xs text-gray-400">Dark comedy, satire, and hilarious chaos</p>
+        </div>
+      </div>
+
+      <div onclick="filterByMood('cry')" class="bg-gray-900/60 hover:bg-gray-800/90 border border-gray-800 hover:border-amber-500/50 p-4 rounded-2xl flex items-center gap-4 cursor-pointer transition-all">
+        <div class="text-3xl">😭</div>
+        <div>
+          <h4 class="font-bold text-white text-sm">Make me cry</h4>
+          <p class="text-xs text-gray-400">Emotional, character-driven drama</p>
+        </div>
+      </div>
+
+      <div onclick="filterByMood('reset')" class="bg-gray-900/60 hover:bg-gray-800/90 border border-gray-800 hover:border-amber-500/50 p-4 rounded-2xl flex items-center gap-4 cursor-pointer transition-all">
+        <div class="text-3xl">✨</div>
+        <div>
+          <h4 class="font-bold text-white text-sm">Reset Filter</h4>
+          <p class="text-xs text-gray-400">Show all television titles in catalog</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
   <!-- MAIN CATALOG -->
-  <main class="max-w-7xl mx-auto px-4 py-8 w-full flex-1">
+  <main id="catalogSection" class="max-w-7xl mx-auto px-4 py-8 w-full flex-1">
     
-    <!-- Navigation Tabs -->
     <div class="flex items-center justify-between mb-6 pb-3 border-b border-gray-800 flex-wrap gap-4">
       <div class="flex items-center gap-2 overflow-x-auto">
-        <button id="tab-all" onclick="setTab('all')" class="px-4 py-2 rounded-xl text-sm font-bold bg-amber-500 text-black transition-all cursor-pointer">
+        <button id="tab-all" onclick="setTab('all')" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-amber-500 text-black transition-all cursor-pointer">
           <i class="fa-solid fa-compass mr-1"></i> <span data-i18n="tab_all">Discover</span>
         </button>
-        <button id="tab-watchlist" onclick="setTab('watchlist')" class="px-4 py-2 rounded-xl text-sm font-semibold bg-gray-900 text-gray-400 hover:text-white border border-gray-800 transition-all cursor-pointer">
+        <button id="tab-watchlist" onclick="setTab('watchlist')" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-gray-900 text-gray-400 hover:text-white border border-gray-800 transition-all cursor-pointer">
           <i class="fa-solid fa-bookmark mr-1 text-blue-400"></i> <span data-i18n="tab_watchlist">Watchlist</span> (<span id="tWatchCount">0</span>)
         </button>
-        <button id="tab-loved" onclick="setTab('loved')" class="px-4 py-2 rounded-xl text-sm font-semibold bg-gray-900 text-gray-400 hover:text-white border border-gray-800 transition-all cursor-pointer">
+        <button id="tab-loved" onclick="setTab('loved')" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-gray-900 text-gray-400 hover:text-white border border-gray-800 transition-all cursor-pointer">
           <i class="fa-solid fa-heart mr-1 text-rose-500"></i> <span data-i18n="tab_loved">Loved</span> (<span id="tLovedCount">0</span>)
         </button>
-        <button id="tab-hated" onclick="setTab('hated')" class="px-4 py-2 rounded-xl text-sm font-semibold bg-gray-900 text-gray-400 hover:text-white border border-gray-800 transition-all cursor-pointer">
+        <button id="tab-hated" onclick="setTab('hated')" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-gray-900 text-gray-400 hover:text-white border border-gray-800 transition-all cursor-pointer">
           <i class="fa-solid fa-thumbs-down mr-1 text-gray-400"></i> <span data-i18n="tab_hated">Hated</span> (<span id="tHatedCount">0</span>)
         </button>
       </div>
@@ -194,16 +399,15 @@
       </div>
     </div>
 
-    <!-- Active Tab Header -->
     <div class="flex items-center justify-between mb-6">
       <h2 id="currentTabTitle" class="text-xl sm:text-2xl font-bold text-white flex items-center gap-3">
         <span id="tabHeadingText">Discover</span>
         <span id="showsCount" class="text-xs bg-gray-800 text-gray-400 font-normal px-2.5 py-0.5 rounded-full">0 shows</span>
       </h2>
-      <span class="text-xs text-gray-500" data-i18n="db_live_notice">Live FastAPI & Neon</span>
+      <span class="text-xs text-gray-500">Live FastAPI & Neon</span>
     </div>
 
-    <!-- Grid -->
+    <!-- Shows Grid -->
     <div id="showsGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-6"></div>
 
     <!-- Pagination -->
@@ -227,20 +431,108 @@
     </div>
   </main>
 
-  <!-- FOOTER -->
-  <footer class="border-t border-gray-800 bg-gray-950 py-6 text-center text-xs text-gray-500">
-    CineDex Full-Stack Tracker • FastAPI & Neon PostgreSQL
+  <!-- LUXURY FOOTER (MATCHING THE SCREENSHOT) -->
+  <footer class="border-t border-gray-800/80 bg-[#05070a] pt-14 pb-8 text-gray-400 text-xs">
+    <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-10 pb-12 border-b border-gray-800/60">
+      
+      <!-- Brand & Mission -->
+      <div class="space-y-4">
+        <a href="#" class="flex items-center gap-2.5 text-xl font-black text-white">
+          <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-amber-600 to-amber-400 p-[1.5px]">
+            <div class="w-full h-full bg-[#05070a] rounded-full flex items-center justify-center">
+              <i class="fa-solid fa-play text-amber-400 text-[10px] ml-0.5"></i>
+            </div>
+          </div>
+          <span>Cine<span class="text-amber-400">Dex</span></span>
+        </a>
+        <p class="leading-relaxed text-gray-400 text-xs">
+          Your ultimate destination for discovering, tracking, and curating the best television series from around the world.
+        </p>
+        <!-- Social Icons -->
+        <div class="flex items-center gap-3 pt-2">
+          <a href="#" class="w-9 h-9 rounded-xl bg-gray-900 border border-gray-800 flex items-center justify-center text-gray-400 hover:text-amber-400 hover:border-amber-500/40 transition-colors">
+            <i class="fa-brands fa-instagram"></i>
+          </a>
+          <a href="#" class="w-9 h-9 rounded-xl bg-gray-900 border border-gray-800 flex items-center justify-center text-gray-400 hover:text-amber-400 hover:border-amber-500/40 transition-colors">
+            <i class="fa-brands fa-telegram"></i>
+          </a>
+          <a href="https://github.com/xpmahdi" target="_blank" class="w-9 h-9 rounded-xl bg-gray-900 border border-gray-800 flex items-center justify-center text-gray-400 hover:text-amber-400 hover:border-amber-500/40 transition-colors">
+            <i class="fa-brands fa-github"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Quick Links -->
+      <div>
+        <h4 class="text-white font-bold text-sm mb-4">Quick Links</h4>
+        <ul class="space-y-2.5">
+          <li><a href="#catalogSection" class="hover:text-amber-400 transition-colors">Series</a></li>
+          <li><a href="#moodSection" class="hover:text-amber-400 transition-colors">Mood Discovery</a></li>
+          <li><a href="#universeSection" class="hover:text-amber-400 transition-colors">Universe Constellation</a></li>
+          <li><a href="#" onclick="setTab('watchlist')" class="hover:text-amber-400 transition-colors">Watchlist</a></li>
+          <li><a href="#" onclick="setTab('loved')" class="hover:text-amber-400 transition-colors">Loved Shows</a></li>
+        </ul>
+      </div>
+
+      <!-- Support -->
+      <div>
+        <h4 class="text-white font-bold text-sm mb-4">Support</h4>
+        <ul class="space-y-2.5">
+          <li><a href="#" class="hover:text-amber-400 transition-colors">Help Center</a></li>
+          <li><a href="#" class="hover:text-amber-400 transition-colors">FAQ</a></li>
+          <li><a href="#" class="hover:text-amber-400 transition-colors">Privacy Policy</a></li>
+          <li><a href="#" class="hover:text-amber-400 transition-colors">Terms of Service</a></li>
+        </ul>
+      </div>
+
+      <!-- Contact & Buy Me a Coffee -->
+      <div class="space-y-4">
+        <h4 class="text-white font-bold text-sm mb-2">Contact Us</h4>
+        <div class="flex items-center gap-2 text-gray-300">
+          <i class="fa-solid fa-envelope text-amber-400"></i>
+          <span>cinedex.team@gmail.com</span>
+        </div>
+
+        <!-- Support Us Button -->
+        <a href="https://github.com/xpmahdi" target="_blank" class="block group bg-gradient-to-r from-amber-500/10 to-amber-600/5 hover:from-amber-500/20 hover:to-amber-600/15 border border-amber-500/30 rounded-2xl p-4 transition-all">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-amber-500 flex items-center justify-center text-black font-black text-base shadow-md shadow-amber-500/20">
+                ☕
+              </div>
+              <div>
+                <div class="font-bold text-white text-xs">Support Us</div>
+                <div class="text-[11px] text-gray-400">Buy us a coffee!</div>
+              </div>
+            </div>
+            <i class="fa-solid fa-arrow-right text-amber-400 group-hover:translate-x-1 transition-transform"></i>
+          </div>
+        </a>
+
+        <div class="text-[11px] text-gray-500 flex items-center gap-2 pt-1">
+          <span>Available on:</span>
+          <span class="px-2 py-0.5 rounded bg-gray-900 border border-gray-800 text-gray-300">🌐 Web App</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Bottom Copyright -->
+    <div class="max-w-7xl mx-auto px-4 pt-6 flex items-center justify-between flex-wrap gap-4 text-gray-600">
+      <span>© 2026 CineDex. Developed by <a href="https://github.com/xpmahdi" class="text-gray-400 hover:text-amber-400 font-medium">Mahdi Hosseini</a>.</span>
+      <span>Cloud-Native Architecture • FastAPI & Neon PostgreSQL</span>
+    </div>
   </footer>
 
   <!-- AUTH MODAL -->
-  <div id="authModal" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm hidden items-center justify-center p-4">
-    <div class="bg-gray-900 border border-gray-700 rounded-2xl max-w-sm w-full p-6 relative shadow-2xl">
+  <div id="authModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-gray-900 border border-gray-800 rounded-2xl max-w-sm w-full p-6 relative shadow-2xl">
       <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white cursor-pointer">
         <i class="fa-solid fa-xmark text-lg"></i>
       </button>
 
       <h3 class="text-xl font-bold text-white mb-1" data-i18n="auth_title">Welcome to CineDex</h3>
-      <p class="text-xs text-gray-400 mb-6" data-i18n="auth_desc">Sign in to sync your watchlist and statistics</p>
+      <p class="text-xs text-gray-400 mb-6" data-i18n="auth_desc">Sign in to track your shows and sync screen time</p>
 
       <form id="authForm" onsubmit="handleAuthSubmit(event)" class="space-y-4">
         <div>
@@ -265,96 +557,124 @@
     let currentHeroIndex = 0;
     let heroInterval = null;
     let currentTab = 'all';
+    let currentGenreFilter = '';
+    let currentMoodFilter = '';
     let currentLang = localStorage.getItem('cinedex_lang') || 'en';
     let currentPage = 1;
     const itemsPerPage = 8;
 
-    // داده‌های کاربر ذخیره شده در LocalStorage
     let userLists = {
       loved: JSON.parse(localStorage.getItem('cinedex_loved') || '[]'),
       watchlist: JSON.parse(localStorage.getItem('cinedex_watchlist') || '[]'),
       hated: JSON.parse(localStorage.getItem('cinedex_hated') || '[]')
     };
 
-    // دیکشنری دو زبانه کامل
     const translations = {
       en: {
-        nav_discover: '<i class="fa-solid fa-compass mr-1"></i> Discover',
-        nav_watchlist: '<i class="fa-solid fa-bookmark mr-1 text-blue-400"></i> Watchlist',
-        nav_loved: '<i class="fa-solid fa-heart mr-1 text-rose-500"></i> Loved',
-        nav_hated: '<i class="fa-solid fa-thumbs-down mr-1 text-gray-400"></i> Hated',
+        nav_series: 'Series',
+        nav_moods: 'Moods',
+        nav_universe: 'Universe',
         btn_signin: 'Sign In',
         time_watched_label: 'Total Screen Time:',
-        time_watched_sub: '(based on Loved shows)',
         stat_loved: 'Loved',
-        stat_watchlist: 'Plan to Watch',
+        stat_watchlist: 'Watchlist',
         stat_hated: 'Hated',
-        spotlight_badge: 'Spotlight Pick',
         btn_love_show: 'Mark as Loved',
         btn_add_watchlist: 'Add to Watchlist',
         tab_all: 'Discover',
         tab_watchlist: 'Watchlist',
         tab_loved: 'Loved',
         tab_hated: 'Hated',
-        db_live_notice: 'Live FastAPI & Neon',
         btn_prev: 'Previous',
         btn_next: 'Next',
+        curation_title: 'More than just watching',
+        curation_desc: 'Discover editorial collections, community picks, hidden gems, and curated watch guides designed to make choosing your next series effortless.',
+        universe_title: 'Explore Genre Constellations',
+        universe_desc: 'Click any planet in the orbit to instantly filter series matching that universe.',
+        mood_title: "What's your mood?",
+        mood_desc: 'Choose a vibe and CineDex instantly reshapes the catalog around your feeling.',
         auth_title: 'Welcome to CineDex',
-        auth_desc: 'Sign in to sync your watchlist and statistics',
+        auth_desc: 'Sign in to track your shows and sync screen time',
         auth_user: 'Username',
         auth_pass: 'Password',
-        no_shows: 'No shows found in this category.'
+        no_shows: 'No shows found matching this filter.'
       },
       fa: {
-        nav_discover: '<i class="fa-solid fa-compass ml-1"></i> کاوش سریال‌ها',
-        nav_watchlist: '<i class="fa-solid fa-bookmark ml-1 text-blue-400"></i> در برنامه تماشا',
-        nav_loved: '<i class="fa-solid fa-heart ml-1 text-rose-500"></i> دوست‌داشتنی‌ها',
-        nav_hated: '<i class="fa-solid fa-thumbs-down ml-1 text-gray-400"></i> نپسندیده‌ام',
+        nav_series: 'سریال‌ها',
+        nav_moods: 'حس‌وحال',
+        nav_universe: 'منظومه ژانرها',
         btn_signin: 'ورود به حساب',
         time_watched_label: 'مجموع زمان تماشا:',
-        time_watched_sub: '(بر اساس سریال‌های دیده‌شده)',
         stat_loved: 'علاقه‌مندی',
-        stat_watchlist: 'در برنامه تماشا',
+        stat_watchlist: 'لیست تماشا',
         stat_hated: 'نپسندیده',
-        spotlight_badge: 'پیشنهاد ویژه',
         btn_love_show: 'افزودن به دیده‌شده‌ها',
-        btn_add_watchlist: 'افزودن به لیست تماشا',
+        btn_add_watchlist: 'افزودن به واچ‌لیست',
         tab_all: 'کاوش',
         tab_watchlist: 'لیست تماشا',
         tab_loved: 'دوست‌داشتنی‌ها',
         tab_hated: 'نپسندیده‌ام',
-        db_live_notice: 'اتصال زنده FastAPI و Neon',
         btn_prev: 'قبلی',
         btn_next: 'بعدی',
-        auth_title: 'خوش آمدید به ساین‌دکس',
-        auth_desc: 'برای همگام‌سازی لیست و آمار حساب خود وارد شوید',
+        curation_title: 'فراتر از یک تماشای معمولی',
+        curation_desc: 'مجموعه‌های برگزیده، گوهر‌های کمتر دیده شده و لیست‌های اختصاصی آخر هفته برای انتخاب سریع بهترین سریال.',
+        universe_title: 'منظومه کیهانی ژانرها',
+        universe_desc: 'روی هر یک از سیارات کهکشان کلیک کنید تا سریال‌های همان دسته‌بندی در کاتالوگ نمایش داده شوند.',
+        mood_title: 'الان چه حس و حالی داری؟',
+        mood_desc: 'مود دلخواهت رو انتخاب کن تا ساین‌دکس سریال‌های مناسب رو بهت پیشنهاد بده.',
+        auth_title: 'ورود به ساین‌دکس',
+        auth_desc: 'برای ذخیره واچ‌لیست و ساعت‌های تماشا وارد حساب شوید',
         auth_user: 'نام کاربری',
         auth_pass: 'رمز عبور',
-        no_shows: 'هیچ سریالی در این بخش یافت نشد.'
+        no_shows: 'هیچ سریالی با این فیلتر پیدا نشد.'
       }
     };
 
-    function toggleLanguage() {
-      currentLang = currentLang === 'en' ? 'fa' : 'en';
-      localStorage.setItem('cinedex_lang', currentLang);
+    // ۱. مدیریت سلکتور کشویی زبان
+    window.toggleLangMenu = function() {
+      const menu = document.getElementById("langDropdown");
+      const chevron = document.getElementById("langChevron");
+      menu.classList.toggle("hidden");
+      chevron.classList.toggle("rotate-180");
+    };
+
+    window.selectLanguage = function(lang) {
+      currentLang = lang;
+      localStorage.setItem('cinedex_lang', lang);
+      document.getElementById("langDropdown").classList.add("hidden");
+      document.getElementById("langChevron").classList.remove("rotate-180");
       applyLanguage();
-    }
+    };
+
+    document.addEventListener("click", function(e) {
+      const menu = document.getElementById("langDropdown");
+      const btn = document.getElementById("langMenuBtn");
+      if (menu && btn && !btn.contains(e.target) && !menu.contains(e.target)) {
+        menu.classList.add("hidden");
+        document.getElementById("langChevron").classList.remove("rotate-180");
+      }
+    });
 
     function applyLanguage() {
       const t = translations[currentLang];
       document.documentElement.dir = currentLang === 'fa' ? 'rtl' : 'ltr';
       document.documentElement.lang = currentLang;
-      document.getElementById('langLabel').innerText = currentLang === 'en' ? 'FA' : 'EN';
+
+      document.getElementById("currentLangFlag").innerText = currentLang === 'en' ? '🇬🇧' : '🇮🇷';
+      document.getElementById("currentLangText").innerText = currentLang === 'en' ? 'English' : 'فارسی';
+      document.getElementById("checkEn").classList.toggle("hidden", currentLang !== 'en');
+      document.getElementById("checkFa").classList.toggle("hidden", currentLang !== 'fa');
 
       document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
         if (t[key]) el.innerHTML = t[key];
       });
 
-      updateTabTitle();
+      calculateWatchTime();
       applyFilters();
     }
 
+    // ۲. سیستم تصاویر و پوسترها
     function resolvePoster(show) {
       const title = (show.title || '').toLowerCase();
       if (title.includes('original sin')) return "https://static.tvmaze.com/uploads/images/medium_portrait/542/1355486.jpg";
@@ -366,13 +686,38 @@
 
     function resolveBackdrop(show) {
       const title = (show.title || '').toLowerCase();
-      if (title.includes('original sin') || title.includes('dexter')) return "https://static.tvmaze.com/uploads/images/original_untouched/173/433430.jpg";
-      if (title.includes('breaking bad')) return "https://static.tvmaze.com/uploads/images/original_untouched/501/1253519.jpg";
-      if (title.includes('saul')) return "https://static.tvmaze.com/uploads/images/original_untouched/413/1034988.jpg";
+      if (title.includes('dexter') || title.includes('original sin')) {
+        return "https://media.wired.com/photos/5926a8cef3e2356fd800a08d/3:2/w_2560%2Cc_limit/Dexter.jpg";
+      }
+      if (title.includes('breaking bad')) {
+        return "https://static.tvmaze.com/uploads/images/original_untouched/501/1253519.jpg";
+      }
+      if (title.includes('saul')) {
+        return "https://static.tvmaze.com/uploads/images/original_untouched/413/1034988.jpg";
+      }
       return show.backdrop_path || resolvePoster(show);
     }
 
-    // باز و بسته کردن مدال
+    // ۳. فیلترهای حس‌وحال (Moods) و منظومه کهکشانی (Orbit Planets)
+    window.filterByGenre = function(genre) {
+      currentGenreFilter = genre;
+      currentMoodFilter = '';
+      currentTab = 'all';
+      currentPage = 1;
+      applyFilters();
+      document.getElementById('catalogSection').scrollIntoView({ behavior: 'smooth' });
+    };
+
+    window.filterByMood = function(mood) {
+      currentMoodFilter = mood;
+      currentGenreFilter = '';
+      currentTab = 'all';
+      currentPage = 1;
+      applyFilters();
+      document.getElementById('catalogSection').scrollIntoView({ behavior: 'smooth' });
+    };
+
+    // ۴. احراز هویت
     window.openAuthModal = function() {
       const m = document.getElementById("authModal");
       m.classList.remove("hidden");
@@ -397,7 +742,7 @@
       closeAuthModal();
     };
 
-    // سیستم سه‌گانه لیست‌ها: Watchlist, Loved, Hated
+    // ۵. مدیریت لیست‌ها (Loved, Watchlist, Hated)
     window.toggleList = function(type, showId) {
       const list = userLists[type];
       const index = list.indexOf(showId);
@@ -405,7 +750,6 @@
       if (index > -1) {
         list.splice(index, 1);
       } else {
-        // حذف از سایر لیست‌ها در صورت اضافه شدن به یکی از آنها
         ['loved', 'watchlist', 'hated'].forEach(t => {
           const i = userLists[t].indexOf(showId);
           if (i > -1) userLists[t].splice(i, 1);
@@ -423,7 +767,6 @@
       applyFilters();
     };
 
-    // محاسبه دقیق زمان تماشا (بر مبنای هر قسمت ۵۰ دقیقه برای سریال‌های Loved)
     function calculateWatchTime() {
       let totalMinutes = 0;
       allShows.forEach(show => {
@@ -457,31 +800,23 @@
 
     window.setTab = function(tabName) {
       currentTab = tabName;
+      currentGenreFilter = '';
+      currentMoodFilter = '';
       currentPage = 1;
 
       ['all', 'watchlist', 'loved', 'hated'].forEach(t => {
         const btn = document.getElementById(`tab-${t}`);
         if (t === tabName) {
-          btn.className = "px-4 py-2 rounded-xl text-sm font-bold bg-amber-500 text-black transition-all cursor-pointer";
+          btn.className = "px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-amber-500 text-black transition-all cursor-pointer";
         } else {
-          btn.className = "px-4 py-2 rounded-xl text-sm font-semibold bg-gray-900 text-gray-400 hover:text-white border border-gray-800 transition-all cursor-pointer";
+          btn.className = "px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-gray-900 text-gray-400 hover:text-white border border-gray-800 transition-all cursor-pointer";
         }
       });
 
-      updateTabTitle();
       applyFilters();
     };
 
-    function updateTabTitle() {
-      const t = translations[currentLang];
-      const titleEl = document.getElementById("tabHeadingText");
-      if (currentTab === 'all') titleEl.innerText = currentLang === 'fa' ? 'کاوش همه‌جا' : 'Discover';
-      if (currentTab === 'watchlist') titleEl.innerText = t.tab_watchlist;
-      if (currentTab === 'loved') titleEl.innerText = t.tab_loved;
-      if (currentTab === 'hated') titleEl.innerText = t.tab_hated;
-    }
-
-    // Hero Spotlight & Carousel
+    // ۶. چرخش اسلایدر و کاروسل هیرو
     window.toggleHeroList = function(type) {
       if (!spotlightShows[currentHeroIndex]) return;
       toggleList(type, spotlightShows[currentHeroIndex].id);
@@ -490,15 +825,11 @@
     function updateHeroActionButtons() {
       if (!spotlightShows[currentHeroIndex]) return;
       const showId = spotlightShows[currentHeroIndex].id;
-
       const isLoved = userLists.loved.includes(showId);
       const isWatch = userLists.watchlist.includes(showId);
 
-      const heart = document.getElementById("heroHeart");
-      heart.className = isLoved ? "fa-solid fa-heart text-red-600" : "fa-solid fa-heart";
-
-      const bookmark = document.getElementById("heroBookmark");
-      bookmark.className = isWatch ? "fa-solid fa-bookmark text-blue-400" : "fa-solid fa-bookmark";
+      document.getElementById("heroHeart").className = isLoved ? "fa-solid fa-heart text-rose-500" : "fa-solid fa-heart text-gray-400";
+      document.getElementById("heroBookmark").className = isWatch ? "fa-solid fa-bookmark text-amber-400" : "fa-solid fa-bookmark text-white";
     }
 
     async function fetchShows() {
@@ -520,7 +851,6 @@
         applyLanguage();
       } catch (err) {
         console.error("API Error:", err);
-        statusBadge.className = "flex items-center gap-2 text-xs px-3 py-1.5 rounded-full bg-gray-900 border border-gray-800 text-red-400";
         statusBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-red-500"></span> Backend Offline`;
       }
     }
@@ -528,7 +858,7 @@
     function setupHeroCarousel() {
       renderHeroSlide(currentHeroIndex);
       if (heroInterval) clearInterval(heroInterval);
-      heroInterval = setInterval(() => nextHeroSlide(), 6000);
+      heroInterval = setInterval(() => nextHeroSlide(), 6500);
     }
 
     function renderHeroSlide(index) {
@@ -539,17 +869,26 @@
       heroSec.style.backgroundImage = `url('${resolveBackdrop(show)}')`;
 
       document.getElementById("heroTitle").innerText = show.title || "Dexter";
-      document.getElementById("heroRating").innerHTML = `<i class="fa-solid fa-star"></i> ${show.vote_average || '8.7'}`;
+      document.getElementById("heroRating").innerHTML = `<i class="fa-solid fa-star text-[10px]"></i> ${show.vote_average || '8.7'} IMDb`;
       document.getElementById("heroYear").innerText = show.first_air_date ? show.first_air_date.split('-')[0] : '2006';
-      document.getElementById("heroSeasons").innerText = `${show.total_seasons || 8} Seasons`;
+      document.getElementById("heroSeasons").innerText = `${show.total_seasons || 8} Seasons (${show.total_episodes || 96} Eps)`;
       document.getElementById("heroOverview").innerText = show.overview || "";
 
-      const poster = document.getElementById("heroPoster");
-      poster.src = resolvePoster(show);
+      document.getElementById("heroPoster").src = resolvePoster(show);
 
-      document.getElementById("heroSlideIndicator").innerText = `${index + 1} / ${spotlightShows.length}`;
+      // رندر دات‌های نشانگر اسلاید
+      const dots = document.getElementById("heroDotsContainer");
+      dots.innerHTML = spotlightShows.map((_, i) => `
+        <div onclick="setHeroSlide(${i})" class="h-1.5 rounded-full transition-all cursor-pointer ${i === index ? 'w-8 bg-amber-400' : 'w-2 bg-gray-700 hover:bg-gray-500'}"></div>
+      `).join('');
+
       updateHeroActionButtons();
     }
+
+    window.setHeroSlide = function(i) {
+      currentHeroIndex = i;
+      renderHeroSlide(currentHeroIndex);
+    };
 
     window.nextHeroSlide = function() {
       if (spotlightShows.length === 0) return;
@@ -563,9 +902,11 @@
       renderHeroSlide(currentHeroIndex);
     };
 
+    // ۷. سیستم جامع فیلترها و نمایش کارت‌ها
     function applyFilters() {
       let filtered = [...allShows];
 
+      // فیلتر بر اساس تب
       if (currentTab === 'watchlist') {
         filtered = filtered.filter(s => userLists.watchlist.includes(s.id));
       } else if (currentTab === 'loved') {
@@ -574,12 +915,44 @@
         filtered = filtered.filter(s => userLists.hated.includes(s.id));
       }
 
+      // فیلتر بر اساس منظومه ژانرها
+      if (currentGenreFilter) {
+        filtered = filtered.filter(s => 
+          (s.genre && s.genre.toLowerCase().includes(currentGenreFilter.toLowerCase())) ||
+          (s.title && s.title.toLowerCase().includes(currentGenreFilter.toLowerCase()))
+        );
+      }
+
+      // فیلتر بر اساس مود و حس‌وحال
+      if (currentMoodFilter === 'mind') {
+        filtered = filtered.filter(s => parseFloat(s.vote_average || 0) >= 8.5);
+      } else if (currentMoodFilter === 'adrenaline') {
+        filtered = filtered.filter(s => (s.title && (s.title.includes('Dexter') || s.title.includes('Breaking'))));
+      } else if (currentMoodFilter === 'scare') {
+        filtered = filtered.filter(s => s.title && s.title.includes('Dexter'));
+      } else if (currentMoodFilter === 'laugh') {
+        filtered = filtered.filter(s => s.title && s.title.includes('Saul'));
+      } else if (currentMoodFilter === 'cry') {
+        filtered = filtered.filter(s => parseFloat(s.vote_average || 0) >= 8.8);
+      }
+
+      // جستجو
       const q = document.getElementById("searchInput").value.toLowerCase().trim();
       if (q) {
         filtered = filtered.filter(s => 
           (s.title && s.title.toLowerCase().includes(q)) || 
           (s.overview && s.overview.toLowerCase().includes(q))
         );
+      }
+
+      // تنظیم عنوان هدر کاتالوگ
+      const titleEl = document.getElementById("tabHeadingText");
+      if (currentGenreFilter) {
+        titleEl.innerText = `${currentGenreFilter} Series`;
+      } else if (currentMoodFilter && currentMoodFilter !== 'reset') {
+        titleEl.innerText = `Mood: ${currentMoodFilter.toUpperCase()}`;
+      } else {
+        titleEl.innerText = translations[currentLang][`tab_${currentTab}`] || 'Discover';
       }
 
       document.getElementById("showsCount").innerText = `${filtered.length} shows`;
@@ -600,7 +973,7 @@
     window.changePage = function(delta) {
       currentPage += delta;
       applyFilters();
-      window.scrollTo({ top: 400, behavior: 'smooth' });
+      document.getElementById('catalogSection').scrollIntoView({ behavior: 'smooth' });
     };
 
     function renderCards(shows) {
@@ -616,7 +989,7 @@
         const isHated = userLists.hated.includes(show.id);
 
         return `
-          <div class="group bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden hover:border-amber-500/50 transition-all flex flex-col justify-between hover:shadow-xl hover:shadow-black">
+          <div class="group bg-gray-900 border border-gray-800/80 rounded-2xl overflow-hidden hover:border-amber-500/50 transition-all flex flex-col justify-between hover:shadow-xl hover:shadow-black">
             <div class="relative overflow-hidden aspect-[2/3] bg-gray-950">
               <img 
                 src="${resolvePoster(show)}" 
@@ -628,7 +1001,7 @@
                 <i class="fa-solid fa-star text-[10px]"></i> ${show.vote_average || 'N/A'}
               </div>
               
-              <!-- اکشن‌بار سریع روی هر کارت -->
+              <!-- Quick Actions -->
               <div class="absolute top-2 left-2 flex items-center gap-1">
                 <button 
                   title="Loved"
@@ -639,13 +1012,13 @@
                 <button 
                   title="Watchlist"
                   onclick="toggleList('watchlist', ${show.id})"
-                  class="w-7 h-7 rounded-full bg-black/75 backdrop-blur-md flex items-center justify-center text-xs transition-transform hover:scale-110 cursor-pointer ${isWatch ? 'text-blue-400 font-bold' : 'text-gray-400 hover:text-white'}">
+                  class="w-7 h-7 rounded-full bg-black/75 backdrop-blur-md flex items-center justify-center text-xs transition-transform hover:scale-110 cursor-pointer ${isWatch ? 'text-amber-400 font-bold' : 'text-gray-400 hover:text-white'}">
                   <i class="fa-solid fa-bookmark"></i>
                 </button>
                 <button 
                   title="Hate"
                   onclick="toggleList('hated', ${show.id})"
-                  class="w-7 h-7 rounded-full bg-black/75 backdrop-blur-md flex items-center justify-center text-xs transition-transform hover:scale-110 cursor-pointer ${isHated ? 'text-amber-500 font-bold' : 'text-gray-400 hover:text-white'}">
+                  class="w-7 h-7 rounded-full bg-black/75 backdrop-blur-md flex items-center justify-center text-xs transition-transform hover:scale-110 cursor-pointer ${isHated ? 'text-gray-200 font-bold' : 'text-gray-500 hover:text-white'}">
                   <i class="fa-solid fa-thumbs-down"></i>
                 </button>
               </div>
